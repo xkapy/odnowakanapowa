@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div className="text-6xl">Work in progress...</div>;
+  return <div className="text-2xl">Strona w trakcie przygotowań...</div>;
 }
