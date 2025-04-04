@@ -42,4 +42,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: out/
           server-dir: /domains/odnowakanapowa.pl/public_html/
-          dangerous-clean-slate: true
+          dangerous-clean-slate: false
