@@ -4,11 +4,6 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import logoIcon from "../../../public/images/logo-icon.svg";
 import logoText from "../../../public/images/logo-text.svg";
 import { Link } from "react-router-dom";
-import Services from "../../pages/Services";
-import Home from "../../pages/Home";
-import Store from "../../pages/Store";
-import About from "../../pages/About";
-import Contact from "../../pages/Contact";
 
 const navigation = [
   { name: "Dom", to: "/" },

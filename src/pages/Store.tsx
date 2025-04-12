@@ -1,11 +1,4 @@
-import corner from "../../public/images/corner.jpeg";
-import cornerBig from "../../public/images/cornerBig.jpg";
-import couch from "../../public/images/couch.jpeg";
-import fotel from "../../public/images/fotel.jpeg";
-import pouf from "../../public/images/pouf.jpeg";
-import cornerU from "../../public/images/corner-u.png";
-import chaiM from "../../public/images/chair-m.png";
-import car from "../../public/images/car.jpg";
+import Blank from "../../public/images/blank.png";
 
 const products = [
   {
@@ -13,7 +6,7 @@ const products = [
     name: "Kanapa",
     href: "#",
     price: "od 200 zł",
-    imageSrc: couch,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -21,7 +14,7 @@ const products = [
     name: "Narożnik mały szezlong",
     href: "#",
     price: "od 300 zł",
-    imageSrc: corner,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -29,7 +22,7 @@ const products = [
     name: "Narożnik duży L",
     href: "#",
     price: "od 350 zł",
-    imageSrc: cornerBig,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -37,7 +30,7 @@ const products = [
     name: "Narożnik duży U",
     href: "#",
     price: "od 400 zł",
-    imageSrc: cornerU,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -45,7 +38,7 @@ const products = [
     name: "Fotel mały",
     href: "#",
     price: "od 100 zł",
-    imageSrc: fotel,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -53,7 +46,7 @@ const products = [
     name: "Fotel duży",
     href: "#",
     price: "od 150 zł",
-    imageSrc: fotel,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -61,7 +54,7 @@ const products = [
     name: "Krzesło tapicerowane",
     href: "#",
     price: "od 30 zł",
-    imageSrc: chaiM,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -69,7 +62,7 @@ const products = [
     name: "Puf podnóżek",
     href: "#",
     price: "od 40 zł",
-    imageSrc: pouf,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -77,7 +70,7 @@ const products = [
     name: "Poduszka tepicerowana",
     href: "#",
     price: "od 50 zł",
-    imageSrc: pouf,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
 ];
@@ -88,7 +81,7 @@ const products2 = [
     name: "Materac pojedynczy",
     href: "#",
     price: "od 150 zł",
-    imageSrc: pouf,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -96,7 +89,7 @@ const products2 = [
     name: "Materac podwójny",
     href: "#",
     price: "od 250 zł",
-    imageSrc: pouf,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
 ];
@@ -107,7 +100,7 @@ const products3 = [
     name: "Samochód mały",
     href: "#",
     price: "od 300 zł",
-    imageSrc: car,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -115,7 +108,7 @@ const products3 = [
     name: "Samochód duży",
     href: "#",
     price: "od 350 zł",
-    imageSrc: car,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
 ];
@@ -126,7 +119,7 @@ const products4 = [
     name: "Usuwanie plam",
     href: "#",
     price: "od 50 zł",
-    imageSrc: car,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
   {
@@ -134,7 +127,7 @@ const products4 = [
     name: "Usuwnie nieprzyjemnych zapachów",
     href: "#",
     price: "od 100 zł",
-    imageSrc: car,
+    imageSrc: Blank,
     imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
   },
 ];
@@ -168,6 +161,17 @@ export default function Store() {
         <h2 className="pt-20 pb-5 text-5xl font-bold">Tapicerka samochodowa</h2>
         <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           {products3.map((product) => (
+            <a key={product.id} href={product.href} className="group">
+              <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
+              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
+              <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
+            </a>
+          ))}
+        </div>
+
+        <h2 className="pt-20 pb-5 text-5xl font-bold">Inne</h2>
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+          {products4.map((product) => (
             <a key={product.id} href={product.href} className="group">
               <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
               <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
