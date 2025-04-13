@@ -39,17 +39,17 @@ export default function Home() {
         <div className="flex w-[360px] relative max-lg:hidden">
           <div className="flex w-[550px] gap-6 absolute top-0 -right-45 pt-25 max-xl:-right-82">
             <div className="flex flex-col justify-end gap-6 w-1/3 pb-20">
-              <div className={`bg-[url("../../public/images/sofa2.jpg")] bg-cover bg-center rounded-xl h-60`}></div>
+              <div className="bg-sofa-2 bg-cover bg-center rounded-xl h-60"></div>
             </div>
 
             <div className="flex flex-col justify-end gap-6 w-1/3 max-xl:pt-20">
-              <div className={`bg-[url("../../public/images/sofa4.jpg")] bg-cover bg-center rounded-xl h-60`}></div>
-              <div className={`bg-[url("../../public/images/sofa3.jpg")] bg-cover bg-center rounded-xl h-60`}></div>
+              <div className="bg-sofa-4 bg-cover bg-center rounded-xl h-60"></div>
+              <div className="bg-sofa-3 bg-cover bg-center rounded-xl h-60"></div>
             </div>
 
             <div className="flex flex-col justify-end gap-6 w-1/3 pb-40 max-xl:hidden">
-              <div className={`bg-[url("../../public/images/sofa5.jpg")] bg-cover bg-center rounded-xl h-60`}></div>
-              <div className={`bg-[url("../../public/images/sofa1.jpg")] bg-cover bg-center rounded-xl h-60`}></div>
+              <div className="bg-sofa-5 bg-cover bg-center rounded-xl h-60"></div>
+              <div className="bg-sofa-1 bg-cover bg-center rounded-xl h-60"></div>
             </div>
           </div>
         </div>
