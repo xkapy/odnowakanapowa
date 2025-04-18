@@ -6,10 +6,10 @@ import logoText from "../../../public/images/logo-text.svg";
 import { Link } from "react-router-dom";
 
 const navigation = [
-  { name: "Dom", to: "/" },
-  { name: "Usługi", to: "/services" },
-  { name: "Cennik", to: "/store" },
-  { name: "O nas", to: "/about" },
+  { id: "home", name: "Home", to: "/" },
+  { id: "services", name: "Usługi", to: "/services" },
+  { id: "store", name: "Cennik", to: "/store" },
+  { id: "about", name: "O nas", to: "/about" },
 ];
 
 const Navbar = () => {
@@ -33,7 +33,7 @@ const Navbar = () => {
         </div>
         <div className="hidden lg:flex lg:gap-x-12">
           {navigation.map((item) => (
-            <Link key={item.name} to={item.to} className="text-md/6 font-semibold text-gray-900">
+            <Link key={item.id} to={item.to} className="text-md/6 font-semibold text-gray-900">
               {item.name}
             </Link>
           ))}
@@ -61,7 +61,7 @@ const Navbar = () => {
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
                 {navigation.map((item) => (
-                  <Link key={item.name} to={item.to} className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
+                  <Link key={item.id} to={item.to} className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
                     {item.name}
                   </Link>
                 ))}

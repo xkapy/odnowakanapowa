@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --color-blue: #0abde3;
-  --color-blue-light: #9de4f3;
-  --color-blue-dark: #546de5;
+  --color-blue-light: #84c1f1;
+  --color-blue-dark: #0984e3;
+  --color-blue-dark-hover: #0876cc;
 }
 
 @layer base {
