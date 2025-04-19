@@ -6,6 +6,8 @@ import Store from "../pages/Store";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsOfUse from "../pages/TermsOfUse";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,8 @@ const router = createBrowserRouter([
       { path: "store", element: <Store /> },
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
+      { path: "terms-of-use", element: <TermsOfUse /> },
       { path: "*", element: <NotFound /> },
     ],
   },

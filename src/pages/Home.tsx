@@ -23,15 +23,15 @@ export default function Home() {
               Każdy zasługuje na odrobinę świeżości i przyjemności we własnym domu. My sprawimy, że Twoje ulubione miejsca będą czyste i pachnące.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
-                href="#"
+              <Link
+                to="/store"
                 className="rounded-md bg-[var(--color-blue-dark)] px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-[var(--color-blue-dark-hover)] transition duration-100 ease-in-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Zaczynajmy
-              </a>
-              <a href="#" className="text-sm/6 font-semibold text-gray-900">
+              </Link>
+              <Link to="/services" className="text-sm/6 font-semibold text-gray-900">
                 Dowiedz się więcej <span aria-hidden="true">→</span>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

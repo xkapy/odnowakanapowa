@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import logoText from "../../../public/images/logo-text.svg";
 import logoIcon from "../../../public/images/logo-icon.svg";
 import olxLogo from "../../../public/images/olx-logo.svg";
@@ -11,7 +12,6 @@ const Footer = () => {
             <a href="/" className="flex items-center">
               <img src={logoIcon} className="h-8 me-3" alt="logoIcon" />
               <img src={logoText} className="self-center h-5" alt="logoText" />
-              {/* <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-black">Odnowa Kanapowa</span> */}
             </a>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
@@ -19,24 +19,24 @@ const Footer = () => {
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Linki</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-3">
-                  <a href="#" className="hover:underline">
+                  <Link to="/services" className="hover:underline">
                     Usługi
-                  </a>
+                  </Link>
                 </li>
                 <li className="mb-3">
-                  <a href="#" className="hover:underline">
+                  <Link to="/store" className="hover:underline">
                     Cennik
-                  </a>
+                  </Link>
                 </li>
                 <li className="mb-3">
-                  <a href="#" className="hover:underline">
+                  <Link to="/about" className="hover:underline">
                     O nas
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <Link to="/contact" className="hover:underline">
                     Kontakt
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -44,19 +44,22 @@ const Footer = () => {
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Śledź nas</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-3">
-                  <a href="https://github.com/themesberg/flowbite" className="hover:underline ">
+                  <Link to="https://www.facebook.com/profile.php?id=61572996153015&sk=about" className="hover:underline ">
                     Facebook
-                  </a>
+                  </Link>
                 </li>
                 <li className="mb-3">
-                  <a href="https://github.com/themesberg/flowbite" className="hover:underline ">
+                  <Link
+                    to="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
+                    className="hover:underline "
+                  >
                     Instagram
-                  </a>
+                  </Link>
                 </li>
                 <li className="mb-3">
-                  <a href="https://github.com/themesberg/flowbite" className="hover:underline ">
+                  <Link to="https://www.olx.pl/978566149" className="hover:underline ">
                     Olx
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -64,14 +67,14 @@ const Footer = () => {
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Informacje</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-4">
-                  <a href="#" className="hover:underline">
+                  <Link to="/privacy-policy" className="hover:underline">
                     Polityka Prywatności
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <Link to="/terms-of-use" className="hover:underline">
                     Warunki oraz Regulamin
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -81,14 +84,14 @@ const Footer = () => {
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 Odnowa Kanapowa. Wszystkie prawa zastrzeżone.</span>
           <div className="flex mt-4 sm:justify-center sm:mt-0">
-            <a href="https://www.facebook.com/profile.php?id=61572996153015&sk=about" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out">
+            <Link to="https://www.facebook.com/profile.php?id=61572996153015&sk=about" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out">
               <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 8 19">
                 <path fill-rule="evenodd" d="M6.135 3H8V0H6.135a4.147 4.147 0 0 0-4.142 4.142V6H0v3h2v9.938h3V9h2.021l.592-3H5V3.591A.6.6 0 0 1 5.592 3h.543Z" clip-rule="evenodd" />
               </svg>
               <span className="sr-only">Facebook page</span>
-            </a>
-            <a
-              href="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
+            </Link>
+            <Link
+              to="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
               target="blank"
               className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5"
             >
@@ -99,11 +102,11 @@ const Footer = () => {
                 ></path>
               </svg>
               <span className="sr-only">Instagram page</span>
-            </a>
-            <a href="https://www.olx.pl/978566149" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5">
+            </Link>
+            <Link to="https://www.olx.pl/978566149" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5">
               <img src={olxLogo} alt="Olx logo" className="w-5.5 h-4" aria-hidden="true" />
               <span className="sr-only">Olx page</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
