@@ -5,15 +5,6 @@ import { Link } from "react-router-dom";
 export default function Home() {
   return (
     <div className="bg-white">
-      <div className="fixed bottom-0 left-0 p-2 bg-black text-white text-xs z-50">
-        <div className="block sm:hidden">Base</div>
-        <div className="hidden sm:block md:hidden">sm</div>
-        <div className="hidden md:block lg:hidden">md</div>
-        <div className="hidden lg:block xl:hidden">lg</div>
-        <div className="hidden xl:block 2xl:hidden">xl</div>
-        <div className="hidden 2xl:block">2xl</div>
-      </div>
-
       <div className="relative isolate px-6 pt-14 lg:px-8 flex justify-center gap-20 overflow-hidden h-dvh">
         <div className="max-w-3xl py-32 sm:py-48 lg:py-56">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
