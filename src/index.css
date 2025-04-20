@@ -8,18 +8,18 @@
 
 @layer base {
   .bg-sofa-1 {
-    background-image: url("../public/images/sofa1.jpg");
+    background-image: url("./assets/images/sofa1.jpg");
   }
   .bg-sofa-2 {
-    background-image: url("../public/images/sofa2.jpg");
+    background-image: url("./assets/images/sofa2.jpg");
   }
   .bg-sofa-3 {
-    background-image: url("../public/images/sofa3.jpg");
+    background-image: url("./assets/images/sofa3.jpg");
   }
   .bg-sofa-4 {
-    background-image: url("../public/images/sofa4.jpg");
+    background-image: url("./assets/images/sofa4.jpg");
   }
   .bg-sofa-5 {
-    background-image: url("../public/images/sofa5.jpg");
+    background-image: url("./assets/images/sofa5.jpg");
   }
 }

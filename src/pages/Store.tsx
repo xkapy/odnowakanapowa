@@ -1,220 +1,84 @@
-import sofa from "../../public/products/sofa.jpg";
-import chaiseLongue from "../../public/products/chaise-longue.jpg";
-import cornerL from "../../public/products/corner-l.jpg";
-import cornerU from "../../public/products/corner-u.jpg";
-import armchairSmall from "../../public/products/small-armchair.jpg";
-import armchairBig from "../../public/products/big-armchair.jpg";
-import chair from "../../public/products/chair.jpg";
-import pouf from "../../public/products/pouf.jpg";
-import pillow from "../../public/products/pillow.jpg";
-
-import mattressSingle from "../../public/products/single-mattress.jpg";
-import mattressDouble from "../../public/products/double-mattress.jpg";
-
-import carInterior from "../../public/products/car-interior.jpg";
-import carCarpet from "../../public/products/car-carpet.jpg";
-import carFloor from "../../public/products/car-vacum.jpg";
-import carHeadliner from "../../public/products/car-headliner.jpg";
-
-import spray from "../../public/products/spray.jpg";
-import smell from "../../public/products/smell.jpg";
-
-const furniture = [
-  {
-    id: 1,
-    name: "Kanapa",
-    href: "#",
-    price: "od 200 zł",
-    imageSrc: sofa,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 2,
-    name: "Narożnik mały szezlong",
-    href: "#",
-    price: "od 300 zł",
-    imageSrc: chaiseLongue,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 3,
-    name: "Narożnik duży L",
-    href: "#",
-    price: "od 350 zł",
-    imageSrc: cornerL,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 4,
-    name: "Narożnik duży U",
-    href: "#",
-    price: "od 450 zł",
-    imageSrc: cornerU,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 5,
-    name: "Fotel mały",
-    href: "#",
-    price: "od 100 zł",
-    imageSrc: armchairSmall,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 6,
-    name: "Fotel duży",
-    href: "#",
-    price: "od 150 zł",
-    imageSrc: armchairBig,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 7,
-    name: "Krzesło tapicerowane",
-    href: "#",
-    price: "od 30 zł",
-    imageSrc: chair,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 8,
-    name: "Puf podnóżek",
-    href: "#",
-    price: "od 40 zł",
-    imageSrc: pouf,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 9,
-    name: "Poduszka tepicerowana",
-    href: "#",
-    price: "od 40 zł",
-    imageSrc: pillow,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-];
-
-const mattress = [
-  {
-    id: 1,
-    name: "Materac pojedynczy",
-    href: "#",
-    price: "od 150 zł",
-    imageSrc: mattressSingle,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 2,
-    name: "Materac podwójny",
-    href: "#",
-    price: "od 250 zł",
-    imageSrc: mattressDouble,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-];
-
-const vehicle = [
-  {
-    id: 1,
-    name: "fotele samochodowe",
-    href: "#",
-    price: "od 300 zł",
-    imageSrc: carInterior,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 2,
-    name: "Dywanik tekstylny",
-    href: "#",
-    price: "od 20 zł",
-    imageSrc: carCarpet,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 3,
-    name: "Podłoga samochodu",
-    href: "#",
-    price: "od 200 zł",
-    imageSrc: carFloor,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 4,
-    name: "bonetowanie podsufitki",
-    href: "#",
-    price: "od 150 zł",
-    imageSrc: carHeadliner,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-];
-
-const other = [
-  {
-    id: 1,
-    name: "Usuwanie plam",
-    href: "#",
-    price: "od 50 zł",
-    imageSrc: spray,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 2,
-    name: "Usuwnie nieprzyjemnych zapachów",
-    href: "#",
-    price: "od 100 zł",
-    imageSrc: smell,
-    imageAlt: "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-];
+import { useState } from "react";
+import { furniture, mattress, vehicle, other } from "../data/data";
+import { HiOutlineX } from "react-icons/hi";
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  imageSrc: string;
+}
 
 export default function Store() {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
+
   return (
-    <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <h2 className="pt-20 pb-5 text-5xl font-bold">Meble tapicerowane</h2>
-        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {furniture.map((product) => (
-            <a key={product.id} href={product.href} className="group">
-              <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
-              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
-            </a>
-          ))}
-        </div>
-
-        <h2 className="pt-20 pb-5 text-5xl font-bold">Materace</h2>
-        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {mattress.map((product) => (
-            <a key={product.id} href={product.href} className="group">
-              <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
-              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
-            </a>
-          ))}
-        </div>
-
-        <h2 className="pt-20 pb-5 text-5xl font-bold">Tapicerka samochodowa</h2>
-        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {vehicle.map((product) => (
-            <a key={product.id} href={product.href} className="group">
-              <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
-              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
-            </a>
-          ))}
-        </div>
-
-        <h2 className="pt-20 pb-5 text-5xl font-bold">Inne</h2>
-        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {other.map((product) => (
-            <a key={product.id} href={product.href} className="group">
-              <img alt={product.imageAlt} src={product.imageSrc} className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-7/8" />
-              <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-              <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
-            </a>
-          ))}
-        </div>
+    <div className="bg-white pb-30 w-full">
+      <div className="mr-auto px-4 sm:px-8 lg:px-16 xl:px-24 max-w-screen-xl xl:max-w-screen-2xl">
+        {[
+          { title: "Pranie tapicerki meblowej", data: furniture },
+          { title: "Pranie materacy", data: mattress },
+          { title: "Pranie tapicerki samochodowej", data: vehicle },
+          { title: "Inne", data: other },
+        ].map((section, index) => (
+          <section key={section.title} className={index === 0 ? "mt-40" : "mt-20"}>
+            <h2 className={`pb-5 text-3xl sm:text-4xl lg:text-5xl font-bold`}>{section.title}</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left table-fixed">
+                <thead className="text-xs border-b border-gray-200">
+                  <tr>
+                    <th className="w-2/5 px-6 py-3 text-base sm:text-lg font-black">Usługa</th>
+                    <th className="w-1/4 px-6 py-3 text-base sm:text-lg font-black">Cena</th>
+                    <th className="w-1/3 px-6 py-3 text-base sm:text-lg font-black text-right">
+                      <span className="sr-only">akcja</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {section.data.map((product) => (
+                    <tr key={product.id} onClick={() => handleProductClick(product)} className="cursor-pointer bg-white border-b border-gray-200 hover:bg-gray-50">
+                      <td className="px-6 py-4 font-semibold break-words">{product.name}</td>
+                      <td className="px-6 py-4 font-semibold">{product.price}</td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleProductClick(product);
+                          }}
+                          className="font-semibold text-[var(--color-blue-dark)] hover:underline cursor-pointer"
+                        >
+                          Czytaj dalej <span aria-hidden="true">&rarr;</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
       </div>
+
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
+            <button onClick={handleCloseModal} className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl cursor-pointer">
+              <HiOutlineX />
+            </button>
+            <h3 className="text-2xl font-bold mb-4">{selectedProduct.name}</h3>
+            <p className="text-lg mb-2">Cena: {selectedProduct.price}</p>
+            <img src={selectedProduct.imageSrc} alt={selectedProduct.name} />
+            <p className="text-sm text-gray-500">Info ...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

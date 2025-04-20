@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import logoIcon from "../../../public/images/logo-icon.svg";
-import logoText from "../../../public/images/logo-text.svg";
+import logoIcon from "../../assets/images/logo-icon.svg";
+import logoText from "../../assets/images/logo-text.svg";
 import { Link } from "react-router-dom";
 
 const navigation = [

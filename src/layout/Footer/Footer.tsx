@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
-import logoText from "../../../public/images/logo-text.svg";
-import logoIcon from "../../../public/images/logo-icon.svg";
-import olxLogo from "../../../public/images/olx-logo.svg";
+import logoText from "../../assets/images/logo-text.svg";
+import logoIcon from "../../assets/images/logo-icon.svg";
+import olxLogo from "../../assets/images/olx-logo.svg";
 
 const Footer = () => {
   return (
     <footer className="bg-white dark:bg-gray-100">
-      <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
+      <div className="mx-auto max-w-screen-xl 2xl:max-w-screen-2xl w-full p-8 py-6 lg:py-8">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <a href="/" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <img src={logoIcon} className="h-8 me-3" alt="logoIcon" />
               <img src={logoText} className="self-center h-5" alt="logoText" />
-            </a>
+            </Link>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
             <div>
@@ -44,22 +44,23 @@ const Footer = () => {
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Śledź nas</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-3">
-                  <Link to="https://www.facebook.com/profile.php?id=61572996153015&sk=about" className="hover:underline ">
+                  <a href="https://www.facebook.com/profile.php?id=61572996153015&sk=about" className="hover:underline" target="_blank">
                     Facebook
-                  </Link>
+                  </a>
                 </li>
                 <li className="mb-3">
-                  <Link
-                    to="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
-                    className="hover:underline "
+                  <a
+                    href="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
+                    className="hover:underline"
+                    target="_blank"
                   >
                     Instagram
-                  </Link>
+                  </a>
                 </li>
                 <li className="mb-3">
-                  <Link to="https://www.olx.pl/978566149" className="hover:underline ">
+                  <a href="https://www.olx.pl/978566149" className="hover:underline" target="_blank">
                     Olx
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -84,15 +85,15 @@ const Footer = () => {
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 Odnowa Kanapowa. Wszystkie prawa zastrzeżone.</span>
           <div className="flex mt-4 sm:justify-center sm:mt-0">
-            <Link to="https://www.facebook.com/profile.php?id=61572996153015&sk=about" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out">
+            <a href="https://www.facebook.com/profile.php?id=61572996153015&sk=about" target="_blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out">
               <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 8 19">
                 <path fill-rule="evenodd" d="M6.135 3H8V0H6.135a4.147 4.147 0 0 0-4.142 4.142V6H0v3h2v9.938h3V9h2.021l.592-3H5V3.591A.6.6 0 0 1 5.592 3h.543Z" clip-rule="evenodd" />
               </svg>
               <span className="sr-only">Facebook page</span>
-            </Link>
-            <Link
-              to="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
-              target="blank"
+            </a>
+            <a
+              href="https://www.instagram.com/odnowakanapowa?fbclid=IwY2xjawJvhutleHRuA2FlbQIxMAABHvuwlOWvyF-zj5dv7bLg1ubeX75_ZkBwM2XdC7lBbGXn9Ab5qdAdQCQzq7jk_aem_WljfwiuhPHHsVLrSLp1O3A"
+              target="_blank"
               className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5"
             >
               <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
@@ -102,11 +103,11 @@ const Footer = () => {
                 ></path>
               </svg>
               <span className="sr-only">Instagram page</span>
-            </Link>
-            <Link to="https://www.olx.pl/978566149" target="blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5">
+            </a>
+            <a href="https://www.olx.pl/978566149" target="_blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5">
               <img src={olxLogo} alt="Olx logo" className="w-5.5 h-4" aria-hidden="true" />
               <span className="sr-only">Olx page</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

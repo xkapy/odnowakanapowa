@@ -5,7 +5,16 @@ import { Link } from "react-router-dom";
 export default function Home() {
   return (
     <div className="bg-white">
-      <div className="relative isolate px-6 pt-14 lg:px-8 flex justify-center gap-20 overflow-hidden pb-20">
+      <div className="fixed bottom-0 left-0 p-2 bg-black text-white text-xs z-50">
+        <div className="block sm:hidden">Base</div>
+        <div className="hidden sm:block md:hidden">sm</div>
+        <div className="hidden md:block lg:hidden">md</div>
+        <div className="hidden lg:block xl:hidden">lg</div>
+        <div className="hidden xl:block 2xl:hidden">xl</div>
+        <div className="hidden 2xl:block">2xl</div>
+      </div>
+
+      <div className="relative isolate px-6 pt-14 lg:px-8 flex justify-center gap-20 overflow-hidden h-dvh">
         <div className="max-w-3xl py-32 sm:py-48 lg:py-56">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
             <div className="relative rounded-full px-3 py-1 text-sm/6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/25 transition-all duration-100 ease-in-out">
@@ -32,24 +41,6 @@ export default function Home() {
               <Link to="/services" className="text-sm/6 font-semibold text-gray-900">
                 Dowiedz się więcej <span aria-hidden="true">→</span>
               </Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex w-[360px] relative max-lg:hidden">
-          <div className="flex w-[550px] gap-6 absolute top-0 -right-45 pt-25 max-xl:-right-82">
-            <div className="flex flex-col justify-end gap-6 w-1/3 pb-20">
-              <div className="bg-sofa-2 bg-cover bg-center rounded-xl h-60"></div>
-            </div>
-
-            <div className="flex flex-col justify-end gap-6 w-1/3 max-xl:pt-20">
-              <div className="bg-sofa-4 bg-cover bg-center rounded-xl h-60"></div>
-              <div className="bg-sofa-3 bg-cover bg-center rounded-xl h-60"></div>
-            </div>
-
-            <div className="flex flex-col justify-end gap-6 w-1/3 pb-40 max-xl:hidden">
-              <div className="bg-sofa-5 bg-cover bg-center rounded-xl h-60"></div>
-              <div className="bg-sofa-1 bg-cover bg-center rounded-xl h-60"></div>
             </div>
           </div>
         </div>

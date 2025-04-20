@@ -26,7 +26,7 @@ export default function TermsOfUse() {
       </section>
 
       <section className="mb-6">
-        <h2 className="text-4xl font-bold mb-8">Regulamin Serwisu</h2>
+        <h2 className="text-4xl font-bold mb-8">Regulamin</h2>
 
         <section className="mb-6">
           <h3 className="text-xl font-semibold mb-2">1. Postanowienia ogólne</h3>
