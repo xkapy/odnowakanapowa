@@ -5,10 +5,10 @@ import Footer from "./Footer/Footer";
 
 const Layout = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-white w-full overflow-hidden">
       <ScrollToTop />
       <Navbar />
-      <main>
+      <main className="w-full overflow-x-hidden">
         <Outlet />
       </main>
       <Footer />
