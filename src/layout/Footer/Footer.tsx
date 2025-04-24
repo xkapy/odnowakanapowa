@@ -14,7 +14,7 @@ const Footer = () => {
               <img src={logoText} className="self-center h-5" alt="logoText" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-8 sm:gap-0 sm:pl-20 sm:grid-cols-3">
             <div>
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Linki</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
