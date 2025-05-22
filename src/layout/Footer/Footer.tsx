@@ -104,7 +104,11 @@ const Footer = () => {
               </svg>
               <span className="sr-only">Instagram page</span>
             </a>
-            <a href="https://www.olx.pl/978566149" target="_blank" className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5">
+            <a
+              href="https://www.olx.pl/d/oferta/profesjonalne-pranie-tapicerki-swiezosc-w-kazdym-wloknie-CID4371-ID154nxO.html"
+              target="_blank"
+              className="text-gray-500 hover:opacity-70 transition-all duration-100 ease-in-out ms-5"
+            >
               <img src={olxLogo} alt="Olx logo" className="w-5.5 h-4" aria-hidden="true" />
               <span className="sr-only">Olx page</span>
             </a>
