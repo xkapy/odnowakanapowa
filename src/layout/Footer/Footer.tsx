@@ -58,7 +58,7 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="mb-3">
-                  <a href="https://www.olx.pl/978566149" className="hover:underline" target="_blank">
+                  <a href="https://www.olx.pl/d/oferta/profesjonalne-pranie-tapicerki-swiezosc-w-kazdym-wloknie-CID4371-ID154nxO.html" className="hover:underline" target="_blank">
                     Olx
                   </a>
                 </li>
