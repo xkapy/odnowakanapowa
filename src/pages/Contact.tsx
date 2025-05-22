@@ -4,7 +4,7 @@ import { LuFileText, LuMailOpen, LuMessagesSquare, LuCopy } from "react-icons/lu
 import { Link } from "react-router-dom";
 
 const Contact = () => {
-  const [errors, setErrors] = useState<{ email?: string; general?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; phone?: string; general?: string }>({});
   const [popupMessage, setPopupMessage] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
@@ -17,6 +17,7 @@ const Contact = () => {
     const firstName = formData.get("hs-firstname-contacts-1") as string;
     const lastName = formData.get("hs-lastname-contacts-1") as string;
     const email = formData.get("hs-email-contacts-1") as string;
+    const phone = formData.get("hs-phone-number-1") as string;
     const message = formData.get("hs-about-contacts-1") as string;
 
     let validationErrors: typeof errors = {};
@@ -28,6 +29,17 @@ const Contact = () => {
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       validationErrors.email = "Wprowadź poprawny adres e-mail.";
+      setErrors(validationErrors);
+      return;
+    }
+
+    if (phone?.trim()) {
+      if (!/^(?:\+\d{1,3} \d{9}|\+\d{1,3}\s?\d{3}\s?\d{3}\s?\d{3}|\+\d{1,3} \d{3} \d{3} \d{3}|\d{9}|\d{3} \d{3} \d{3})$/.test(phone.trim())) {
+        validationErrors.phone = "Wprowadź poprawny numer telefonu.";
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
@@ -44,7 +56,7 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        setPopupMessage("Formularz został wysłany pomyślnie!");
+        setPopupMessage("Wiadomość została wysłana!");
         form.reset();
         setTimeout(() => setPopupMessage(""), 3000);
       } else {
@@ -127,7 +139,7 @@ const Contact = () => {
                   {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
 
-                <div>
+                <div className="relative">
                   <label htmlFor="hs-phone-number-1" className="sr-only">
                     Phone Number
                   </label>
@@ -135,9 +147,20 @@ const Contact = () => {
                     type="text"
                     name="hs-phone-number-1"
                     id="hs-phone-number-1"
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    className={`py-2.5 sm:py-3 px-4 block w-full border rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none pr-10 ${
+                      errors.phone ? "border-red-500" : "border-gray-200"
+                    }`}
                     placeholder="Numer telefonu"
                   />
+                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                  <div className="absolute inset-y-0 right-3 flex items-center">
+                    <span className="relative flex h-5 w-5 cursor-default items-center justify-center rounded-full bg-gray-200 text-gray-700 text-xs font-bold select-none group">
+                      ?
+                      <div className="absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 rounded-md bg-gray-200 px-2 py-1 text-xs font-normal text-gray-700 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
+                        To pole nie jest wymagane
+                      </div>
+                    </span>
+                  </div>
                 </div>
 
                 <div>
@@ -228,7 +251,7 @@ const Contact = () => {
       <AnimatePresence>
         {popupMessage && (
           <motion.div
-            className="fixed bottom-0 right-0 mb-6 mr-6 p-4 bg-gray-50 border border-gray-200 rounded-lg w-80 z-50 text-green-800 text-sm flex justify-center"
+            className="fixed bottom-0 right-0 mb-6 mr-6 p-4 bg-gray-50 border border-gray-200 rounded-lg w-80 z-50 text-green-700 text-sm flex justify-center"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
