@@ -147,7 +147,7 @@ export const mattress = [
 export const vehicle = [
   {
     id: 1,
-    name: "fotele samochodowe",
+    name: "Fotele samochodowe",
     href: "#",
     duration: 3,
     durationDesc: "około 1,5 godziny",
@@ -177,7 +177,7 @@ export const vehicle = [
   },
   {
     id: 4,
-    name: "bonetowanie podsufitki",
+    name: "Bonetowanie podsufitki",
     href: "#",
     duration: 2,
     durationDesc: "około 1 godziny",
