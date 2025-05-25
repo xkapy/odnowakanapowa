@@ -34,7 +34,7 @@ const Faq = () => {
   `}
                   style={{ padding: "1rem 1rem" }}
                 >
-                  <h5 className="flex-1">{question}</h5> {/* flex-1 sprawi, że h5 zajmie resztę miejsca */}
+                  <h5 className={`flex-1 transition-all duration-500 ease-in-out ${isActive ? "font-bold" : "font-normal"}`}>{question}</h5> {/* flex-1 sprawi, że h5 zajmie resztę miejsca */}
                   {!isActive ? (
                     <svg
                       className="w-6 h-6 text-gray-900 transition duration-500 group-hover:text-[var(--color-blue-dark)] origin-center"

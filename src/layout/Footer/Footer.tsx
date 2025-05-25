@@ -67,14 +67,19 @@ const Footer = () => {
             <div>
               <h2 className="mb-6 font-semibold text-gray-900 dark:text-gray-600">Informacje</h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
-                <li className="mb-4">
+                <li className="mb-3">
                   <Link to="/privacy-policy" className="hover:underline">
                     Polityka Prywatności
                   </Link>
                 </li>
-                <li>
+                <li className="mb-3">
                   <Link to="/terms-of-use" className="hover:underline">
                     Warunki oraz Regulamin
+                  </Link>
+                </li>
+                <li className="mb-3">
+                  <Link to="/faq" className="hover:underline">
+                    FAQ
                   </Link>
                 </li>
               </ul>

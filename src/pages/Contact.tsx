@@ -181,7 +181,7 @@ const Contact = () => {
               <div className="mt-4 grid">
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent cursor-pointer bg-blue-600 text-white hover:bg-blue-700 transition duration-100 ease-in-out focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent cursor-pointer bg-[var(--color-blue-dark)] text-white hover:bg-[var(--color-blue-dark-hover)] transition duration-200 ease-in-out focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   Wyślij
                 </button>
@@ -231,7 +231,7 @@ const Contact = () => {
                   <a className="text-sm font-medium text-gray-600 hover:text-gray-800 focus:outline-hidden focus:text-gray-800" href="mailto:odnowakanapowa@gmail.com">
                     odnowakanapowa@gmail.com
                   </a>
-                  <LuCopy size={14} style={{ cursor: "pointer" }} onClick={handleCopy} />
+                  <LuCopy size={14} style={{ cursor: "pointer", color: "#4a5565", strokeWidth: "2.5px" }} onClick={handleCopy} />
                   <p className="text-sm text-green-600">
                     <AnimatePresence>
                       {copied && (

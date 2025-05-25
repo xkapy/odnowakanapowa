@@ -28,6 +28,7 @@ const getDurationColor = (duration: number): string => {
 
 export default function Store() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -35,10 +36,12 @@ export default function Store() {
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
+    setIsImageLoaded(false);
   };
 
   useEffect(() => {
     if (selectedProduct) {
+      setIsImageLoaded(false);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -130,7 +133,20 @@ export default function Store() {
               </button>
 
               <div className="flex flex-col sm:flex-row gap-10 items-stretch">
-                <img src={selectedProduct.imageSrc} alt={selectedProduct.name} className="w-full sm:w-60 rounded-md object-cover" />
+                <div className="relative w-full sm:w-60 min-h-[200px]">
+                  {!isImageLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md animate-pulse">
+                      <span className="text-gray-400">Ładowanie...</span>
+                      {/* Możesz tu dodać spinner */}
+                    </div>
+                  )}
+                  <img
+                    src={selectedProduct.imageSrc}
+                    alt={selectedProduct.name}
+                    className={`w-full h-full rounded-md object-cover transition-opacity duration-300 ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
+                    onLoad={() => setIsImageLoaded(true)}
+                  />
+                </div>
                 <div className="flex flex-col justify-between flex-1 py-6 not-sm:py-2">
                   <div>
                     <h3 className="text-2xl font-bold">{selectedProduct.name}</h3>
