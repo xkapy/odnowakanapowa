@@ -117,37 +117,23 @@ export default function Store() {
 
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="relative w-full max-w-[22rem] sm:max-w-3xl lg:max-w-fit max-h-[90vh]">
+          <div className="relative w-full max-w-[22rem] sm:max-w-3xl lg:max-w-fit">
             {/* Fixed header z X tylko na małych ekranach */}
-            <div className="fixed top-0 left-0 right-0 bg-white z-60 p-3 flex justify-end rounded-t-md max-w-[22rem] mx-auto sm:hidden">
-              <button onClick={handleCloseModal} className="text-gray-500 hover:text-black text-xl cursor-pointer" aria-label="Zamknij modal">
+            <div className="z-60 flex justify-end mx-auto sm:hidden">
+              <button onClick={handleCloseModal} className="bg-white rounded-md p-2 mb-2 text-gray-500 hover:text-black text-xl cursor-pointer sm:hidden" aria-label="Zamknij modal">
                 <HiOutlineX />
               </button>
             </div>
 
             {/* Scrollowalna zawartość modala */}
-            <div className="bg-white rounded-md shadow-xl p-10 overflow-y-auto max-h-[90vh] pt-2 sm:pt-10">
+            <div className="bg-white rounded-md shadow-xl p-9 pt-6 overflow-y-auto max-h-[60vh] sm:pt-10">
               {/* Przycisk X na większych ekranach - w modalu */}
               <button onClick={handleCloseModal} className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl cursor-pointer hidden sm:block" aria-label="Zamknij modal">
                 <HiOutlineX />
               </button>
 
               <div className="flex flex-col sm:flex-row gap-10 items-stretch">
-                <div className="relative w-full sm:w-60 min-h-[200px]">
-                  {!isImageLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md animate-pulse">
-                      <span className="text-gray-400">Ładowanie...</span>
-                      {/* Możesz tu dodać spinner */}
-                    </div>
-                  )}
-                  <img
-                    src={selectedProduct.imageSrc}
-                    alt={selectedProduct.name}
-                    className={`w-full h-full rounded-md object-cover transition-opacity duration-300 ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
-                    onLoad={() => setIsImageLoaded(true)}
-                  />
-                </div>
-                <div className="flex flex-col justify-between flex-1 py-6 not-sm:py-2">
+                <div className="flex flex-col justify-between flex-1 not-sm:py-2 sm:order-2">
                   <div>
                     <h3 className="text-2xl font-bold">{selectedProduct.name}</h3>
                     <p className="text-lg text-gray-500 font-semibold">{selectedProduct.price}</p>
@@ -167,6 +153,20 @@ export default function Store() {
                       {selectedProduct.durationDesc}
                     </p>
                   </div>
+                </div>
+                <div className="relative w-full sm:w-60 min-h-[200px]">
+                  {!isImageLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md animate-pulse">
+                      <span className="text-gray-400">Ładowanie...</span>
+                      {/* Możesz tu dodać spinner */}
+                    </div>
+                  )}
+                  <img
+                    src={selectedProduct.imageSrc}
+                    alt={selectedProduct.name}
+                    className={`w-full h-full rounded-md object-cover transition-opacity duration-300 ${isImageLoaded ? "opacity-100" : "opacity-0"}`}
+                    onLoad={() => setIsImageLoaded(true)}
+                  />
                 </div>
               </div>
             </div>
