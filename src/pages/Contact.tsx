@@ -47,7 +47,7 @@ const Contact = () => {
     setErrors({});
 
     try {
-      const response = await fetch("https://formspree.io/f/xdkgovqd", {
+      const response = await fetch("https://formspree.io/f/xnndqyed", {
         method: "POST",
         headers: {
           Accept: "application/json",
