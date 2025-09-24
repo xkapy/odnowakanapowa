@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --color-blue-light: #84c1f1;
+  --color-blue-dark: #0984e3;
+  --color-blue-dark-hover: #0876cc;
+}
+
+@layer base {
+  .bg-sofa-1 {
+    background-image: url("./assets/images/sofa1.jpg");
+  }
+  .bg-sofa-2 {
+    background-image: url("./assets/images/sofa2.jpg");
+  }
+  .bg-sofa-3 {
+    background-image: url("./assets/images/sofa3.jpg");
+  }
+  .bg-sofa-4 {
+    background-image: url("./assets/images/sofa4.jpg");
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bg-sofa-5 {
+    background-image: url("./assets/images/sofa5.jpg");
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
