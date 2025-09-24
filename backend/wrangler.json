@@ -1,0 +1,16 @@
+{
+  "name": "odnowa-kanapowa-backend",
+  "main": "src/worker.ts",
+  "compatibility_date": "2024-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "odnowa-kanapowa-db",
+      "database_id": "224216c4-7a70-4ce7-999a-84e84b77b294"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}
