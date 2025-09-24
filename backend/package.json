@@ -23,8 +23,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "bun-types": "^1.2.22",
+    "@cloudflare/workers-types": "^4.20250924.0",
     "wrangler": "^4.39.0"
   },
   "type": "module",

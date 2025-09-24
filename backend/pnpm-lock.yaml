@@ -39,15 +39,12 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
-      '@types/bun':
-        specifier: latest
-        version: 1.2.22(@types/react@19.1.13)
-      bun-types:
-        specifier: ^1.2.22
-        version: 1.2.22(@types/react@19.1.13)
+      '@cloudflare/workers-types':
+        specifier: ^4.20250924.0
+        version: 4.20250924.0
       wrangler:
         specifier: ^4.39.0
-        version: 4.39.0
+        version: 4.39.0(@cloudflare/workers-types@4.20250924.0)
 
 packages:
 
@@ -206,6 +203,9 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@cloudflare/workers-types@4.20250924.0':
+    resolution: {integrity: sha512-pi/OYCroYdwjFWbkciC5oYzlyimDF4ymNotDK0zpLNq91Ogz1IXnVBAYV7fCFAJ/zIxU0RiIBrJIOll/C0pR9Q==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -674,9 +674,6 @@ packages:
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
 
-  '@types/bun@1.2.22':
-    resolution: {integrity: sha512-5A/KrKos2ZcN0c6ljRSOa1fYIyCKhZfIVYeuyb4snnvomnpFqC0tTsEkdqNxbAgExV384OETQ//WAjl3XbYqQA==}
-
   '@types/jsonwebtoken@9.0.10':
     resolution: {integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==}
 
@@ -688,9 +685,6 @@ packages:
 
   '@types/nodemailer@6.4.19':
     resolution: {integrity: sha512-Fi8DwmuAduTk1/1MpkR9EwS0SsDvYXx5RxivAVII1InDCIxmhj/iQm3W8S3EVb/0arnblr6PK0FK4wYa7bwdLg==}
-
-  '@types/react@19.1.13':
-    resolution: {integrity: sha512-hHkbU/eoO3EG5/MZkuFSKmYqPbSVk5byPFa3e7y/8TybHiLMACgI8seVYlicwk7H5K/rI2px9xrQp/C+AUDTiQ==}
 
   acorn-walk@8.3.2:
     resolution: {integrity: sha512-cjkyv4OtNCIeqhHrfS81QWXoCBPExR/J62oyEqepVw8WaQeSqpW2uhuLPh1m9eWhDuOo/jUXVTlifvesOWp/4A==}
@@ -713,11 +707,6 @@ packages:
   buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
 
-  bun-types@1.2.22:
-    resolution: {integrity: sha512-hwaAu8tct/Zn6Zft4U9BsZcXkYomzpHJX28ofvx7k0Zz2HNz54n1n+tDgxoWFGB4PcFvJXJQloPhaV2eP3Q6EA==}
-    peerDependencies:
-      '@types/react': ^19
-
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -735,9 +724,6 @@ packages:
   cookie@1.0.2:
     resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
     engines: {node: '>=18'}
-
-  csstype@3.1.3:
-    resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
 
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
@@ -1311,6 +1297,8 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20250923.0':
     optional: true
 
+  '@cloudflare/workers-types@4.20250924.0': {}
+
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
@@ -1777,12 +1765,6 @@ snapshots:
 
   '@types/bcryptjs@2.4.6': {}
 
-  '@types/bun@1.2.22(@types/react@19.1.13)':
-    dependencies:
-      bun-types: 1.2.22(@types/react@19.1.13)
-    transitivePeerDependencies:
-      - '@types/react'
-
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
@@ -1801,10 +1783,6 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@types/react@19.1.13':
-    dependencies:
-      csstype: 3.1.3
-
   acorn-walk@8.3.2: {}
 
   acorn@8.14.0: {}
@@ -1816,11 +1794,6 @@ snapshots:
   bowser@2.12.1: {}
 
   buffer-equal-constant-time@1.0.1: {}
-
-  bun-types@1.2.22(@types/react@19.1.13):
-    dependencies:
-      '@types/node': 24.5.2
-      '@types/react': 19.1.13
 
   color-convert@2.0.1:
     dependencies:
@@ -1839,8 +1812,6 @@ snapshots:
       color-string: 1.9.1
 
   cookie@1.0.2: {}
-
-  csstype@3.1.3: {}
 
   defu@6.1.4: {}
 
@@ -2033,7 +2004,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20250923.0
       '@cloudflare/workerd-windows-64': 1.20250923.0
 
-  wrangler@4.39.0:
+  wrangler@4.39.0(@cloudflare/workers-types@4.20250924.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@cloudflare/unenv-preset': 2.7.4(unenv@2.0.0-rc.21)(workerd@1.20250923.0)
@@ -2044,6 +2015,7 @@ snapshots:
       unenv: 2.0.0-rc.21
       workerd: 1.20250923.0
     optionalDependencies:
+      '@cloudflare/workers-types': 4.20250924.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
