@@ -7,13 +7,13 @@ const user = new Hono<CloudflareAppContext>();
 // GET /user/profile - get user profile
 user.get("/profile", authMiddleware(), async (c) => {
   try {
-    // For now return mock user data
+    // Return admin user data
     return c.json({
       id: 1,
-      email: "admin@example.com",
-      firstName: "Admin",
-      lastName: "User",
-      phone: null,
+      email: "odnowakanapowa@gmail.com",
+      firstName: "Adam",
+      lastName: "Gembalczyk",
+      phone: "785922680",
       isAdmin: true,
     });
   } catch (error) {

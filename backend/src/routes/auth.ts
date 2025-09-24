@@ -25,16 +25,17 @@ auth.post("/login", zValidator("json", loginSchema), async (c) => {
   const { email, password } = c.req.valid("json");
   
   try {
-    // Simple hardcoded admin check - replace with database lookup
-    if (email === "admin@example.com" && password === "admin123") {
+    // Admin credentials
+    if (email === "odnowakanapowa@gmail.com" && password === "Lunislava_17") {
       return c.json({
         message: "Login successful",
         token: "admin-token-123",
         user: {
           id: 1,
-          email: "admin@example.com",
-          firstName: "Admin",
-          lastName: "User",
+          email: "odnowakanapowa@gmail.com",
+          firstName: "Adam",
+          lastName: "Gembalczyk",
+          phone: "785922680",
           isAdmin: true,
         },
       });
