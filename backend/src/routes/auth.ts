@@ -37,6 +37,7 @@ auth.post("/login", zValidator("json", loginSchema), async (c) => {
           lastName: "Gembalczyk",
           phone: "785922680",
           isAdmin: true,
+          role: "admin",
         },
       });
     }

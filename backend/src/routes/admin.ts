@@ -9,7 +9,7 @@ admin.get("/check", adminMiddleware(), async (c) => {
   try {
     return c.json({
       message: "Admin access granted",
-      isAdmin: true
+      isAdmin: true,
     });
   } catch (error) {
     console.error("Admin check error:", error);
@@ -30,19 +30,19 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
         guestEmail: "jan@example.com",
         guestPhone: "123456789",
         description: "Czyszczenie kanapy",
-        service: "Czyszczenie kanapy"
+        service: "Czyszczenie kanapy",
       },
       {
         id: 2,
         date: "2025-09-26",
-        time: "14:00", 
+        time: "14:00",
         status: "confirmed",
         guestName: "Anna Nowak",
         guestEmail: "anna@example.com",
         guestPhone: "987654321",
         description: "Czyszczenie fotela",
-        service: "Czyszczenie fotela"
-      }
+        service: "Czyszczenie fotela",
+      },
     ]);
   } catch (error) {
     console.error("Get admin appointments error:", error);
@@ -55,14 +55,14 @@ admin.put("/appointments/:id", adminMiddleware(), async (c) => {
   try {
     const appointmentId = c.req.param("id");
     const body = await c.req.json();
-    
+
     return c.json({
       message: "Appointment updated successfully",
       appointment: {
         id: appointmentId,
         ...body,
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
     console.error("Update appointment error:", error);
@@ -75,11 +75,11 @@ admin.put("/appointments/:id/status", adminMiddleware(), async (c) => {
   try {
     const appointmentId = c.req.param("id");
     const body = await c.req.json();
-    
+
     return c.json({
       message: "Appointment status updated successfully",
       appointmentId,
-      status: body.status
+      status: body.status,
     });
   } catch (error) {
     console.error("Update appointment status error:", error);
@@ -91,10 +91,10 @@ admin.put("/appointments/:id/status", adminMiddleware(), async (c) => {
 admin.delete("/appointments/:id", adminMiddleware(), async (c) => {
   try {
     const appointmentId = c.req.param("id");
-    
+
     return c.json({
       message: "Appointment deleted successfully",
-      appointmentId
+      appointmentId,
     });
   } catch (error) {
     console.error("Delete appointment error:", error);

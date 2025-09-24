@@ -15,6 +15,7 @@ user.get("/profile", authMiddleware(), async (c) => {
       lastName: "Gembalczyk",
       phone: "785922680",
       isAdmin: true,
+      role: "admin",
     });
   } catch (error) {
     console.error("Get profile error:", error);
@@ -27,7 +28,7 @@ user.put("/profile", authMiddleware(), async (c) => {
   try {
     const body = await c.req.json();
     console.log("Update profile request:", body);
-    
+
     // For demo purposes, just return success
     return c.json({
       message: "Profile updated successfully",
@@ -38,7 +39,7 @@ user.put("/profile", authMiddleware(), async (c) => {
         lastName: body.lastName || "Gembalczyk",
         phone: body.phone || "785922680",
         isAdmin: true,
-      }
+      },
     });
   } catch (error) {
     console.error("Update profile error:", error);
@@ -51,7 +52,7 @@ user.get("/appointments", authMiddleware(), async (c) => {
   try {
     // Return empty appointments for now
     return c.json({
-      appointments: []
+      appointments: [],
     });
   } catch (error) {
     console.error("Get appointments error:", error);
@@ -64,10 +65,10 @@ user.put("/change-password", authMiddleware(), async (c) => {
   try {
     const body = await c.req.json();
     console.log("Change password request for admin user");
-    
+
     // For demo purposes, just return success
     return c.json({
-      message: "Password changed successfully"
+      message: "Password changed successfully",
     });
   } catch (error) {
     console.error("Change password error:", error);
@@ -79,10 +80,10 @@ user.put("/change-password", authMiddleware(), async (c) => {
 user.delete("/delete-profile", authMiddleware(), async (c) => {
   try {
     console.log("Delete profile request for admin user");
-    
+
     // For demo purposes, just return success
     return c.json({
-      message: "Profile deletion requested successfully"
+      message: "Profile deletion requested successfully",
     });
   } catch (error) {
     console.error("Delete profile error:", error);
