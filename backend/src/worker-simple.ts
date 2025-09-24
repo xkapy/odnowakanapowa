@@ -1,5 +1,13 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
+import { Hono } from "hono";// Simple routes for testing
+app.get("/", (c) => {
+  return c.json({ 
+    message: "Odnowa Kanapowa API - Cloudflare Workers", 
+    status: "running",
+    environment: c.env?.ENVIRONMENT || "development",
+    version: "1.0.1",
+    updated: new Date().toISOString()
+  });
+});{ cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { CloudflareAppContext } from "./types/cloudflare";

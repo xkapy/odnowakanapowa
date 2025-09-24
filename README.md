@@ -2,6 +2,9 @@
 
 Aplikacja do zarządzania wizytami i usługami czyszczenia mebli tapicerowanych.
 
+**🚀 Live na:** https://odnowakanapowa.pl  
+**🔗 API:** https://api.odnowakanapowa.pl
+
 ## Struktura Projektu
 
 ```
