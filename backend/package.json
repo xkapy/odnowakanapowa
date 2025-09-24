@@ -2,14 +2,16 @@
   "name": "odnowakanapowa-backend",
   "version": "1.0.0",
   "description": "Backend for Odnowa Kanapowa application",
-  "main": "src/worker-simple.ts",
+  "main": "src/worker.ts",
   "scripts": {
-    "dev": "bun run --watch src/worker-simple.ts",
-    "start": "bun run src/worker-simple.ts",
-    "build": "bun build src/worker-simple.ts --outdir ./dist"
+    "dev": "bun run --watch src/worker.ts",
+    "start": "bun run src/worker.ts",
+    "build": "bun build src/worker.ts --outdir ./dist"
   },
   "dependencies": {
-    "hono": "^4.6.3"
+    "hono": "^4.6.3",
+    "zod": "^3.23.8",
+    "@hono/zod-validator": "^0.2.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250924.0",
