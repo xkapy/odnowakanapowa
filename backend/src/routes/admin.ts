@@ -20,28 +20,81 @@ admin.get("/check", adminMiddleware(), async (c) => {
 // GET /admin/appointments - get all appointments for admin
 admin.get("/appointments", adminMiddleware(), async (c) => {
   try {
+    // Try to get real data from database first
+    const db = c.env.DB;
+    try {
+      const result = await db.prepare(`
+        SELECT 
+          appointments.*,
+          users.first_name,
+          users.last_name,
+          users.email,
+          users.phone
+        FROM appointments 
+        LEFT JOIN users ON appointments.user_id = users.id
+        ORDER BY appointments.date DESC, appointments.time DESC
+      `).all();
+      
+      if (result.results && result.results.length > 0) {
+        const appointments = result.results.map((row: any) => ({
+          id: row.id,
+          date: row.date,
+          time: row.time,
+          status: row.status,
+          service: row.description,
+          description: row.description,
+          user: {
+            firstName: row.first_name || row.guest_name?.split(' ')[0] || 'Gość',
+            lastName: row.last_name || row.guest_name?.split(' ')[1] || '',
+            email: row.email || row.guest_email,
+            phone: row.phone || row.guest_phone
+          },
+          guestName: row.guest_name,
+          guestEmail: row.guest_email, 
+          guestPhone: row.guest_phone
+        }));
+        
+        return c.json(appointments);
+      }
+    } catch (dbError) {
+      console.error("Database query error:", dbError);
+    }
+    
+    // Fallback to mock data if database is empty or has issues
     return c.json([
       {
         id: 1,
         date: "2025-09-25",
         time: "10:00",
         status: "pending",
+        service: "Czyszczenie kanapy",
+        description: "Czyszczenie kanapy",
+        user: {
+          firstName: "Jan",
+          lastName: "Kowalski",
+          email: "jan@example.com",
+          phone: "123456789"
+        },
         guestName: "Jan Kowalski",
         guestEmail: "jan@example.com",
-        guestPhone: "123456789",
-        description: "Czyszczenie kanapy",
-        service: "Czyszczenie kanapy",
+        guestPhone: "123456789"
       },
       {
         id: 2,
-        date: "2025-09-26",
+        date: "2025-09-26", 
         time: "14:00",
         status: "confirmed",
+        service: "Czyszczenie fotela",
+        description: "Czyszczenie fotela",
+        user: {
+          firstName: "Anna",
+          lastName: "Nowak",
+          email: "anna@example.com",
+          phone: "987654321"
+        },
         guestName: "Anna Nowak",
         guestEmail: "anna@example.com",
-        guestPhone: "987654321",
-        description: "Czyszczenie fotela",
-        service: "Czyszczenie fotela",
+        guestPhone: "987654321"
       },
     ]);
   } catch (error) {
@@ -125,6 +178,41 @@ admin.get("/dashboard", adminMiddleware(), async (c) => {
   } catch (error) {
     console.error("Get dashboard error:", error);
     return c.json({ error: "Failed to get dashboard data" }, 500);
+  }
+});
+
+// GET /admin/db-status - check database status
+admin.get("/db-status", adminMiddleware(), async (c) => {
+  try {
+    const db = c.env.DB;
+    
+    // Check if tables exist
+    const tables = await db.prepare(`
+      SELECT name FROM sqlite_master WHERE type='table';
+    `).all();
+    
+    // Count records in each table
+    const counts: Record<string, any> = {};
+    if (tables.results) {
+      for (const table of tables.results) {
+        try {
+          const tableName = (table as any).name;
+          const count = await db.prepare(`SELECT COUNT(*) as count FROM ${tableName}`).first();
+          counts[tableName] = (count as any)?.count || 0;
+        } catch (e) {
+          counts[(table as any).name] = 'Error';
+        }
+      }
+    }
+    
+    return c.json({
+      tables: tables.results || [],
+      counts,
+      environment: c.env.ENVIRONMENT
+    });
+  } catch (error) {
+    console.error("DB status error:", error);
+    return c.json({ error: "Failed to check database status" }, 500);
   }
 });
 
