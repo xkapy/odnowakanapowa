@@ -23,7 +23,9 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
     // Try to get real data from database first
     const db = c.env.DB;
     try {
-      const result = await db.prepare(`
+      const result = await db
+        .prepare(
+          `
         SELECT 
           appointments.*,
           users.first_name,
@@ -33,8 +35,10 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
         FROM appointments 
         LEFT JOIN users ON appointments.user_id = users.id
         ORDER BY appointments.date DESC, appointments.time DESC
-      `).all();
-      
+      `
+        )
+        .all();
+
       if (result.results && result.results.length > 0) {
         const appointments = result.results.map((row: any) => ({
           id: row.id,
@@ -44,22 +48,22 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
           service: row.description,
           description: row.description,
           user: {
-            firstName: row.first_name || row.guest_name?.split(' ')[0] || 'Gość',
-            lastName: row.last_name || row.guest_name?.split(' ')[1] || '',
+            firstName: row.first_name || row.guest_name?.split(" ")[0] || "Gość",
+            lastName: row.last_name || row.guest_name?.split(" ")[1] || "",
             email: row.email || row.guest_email,
-            phone: row.phone || row.guest_phone
+            phone: row.phone || row.guest_phone,
           },
           guestName: row.guest_name,
-          guestEmail: row.guest_email, 
-          guestPhone: row.guest_phone
+          guestEmail: row.guest_email,
+          guestPhone: row.guest_phone,
         }));
-        
+
         return c.json(appointments);
       }
     } catch (dbError) {
       console.error("Database query error:", dbError);
     }
-    
+
     // Fallback to mock data if database is empty or has issues
     return c.json([
       {
@@ -73,15 +77,15 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
           firstName: "Jan",
           lastName: "Kowalski",
           email: "jan@example.com",
-          phone: "123456789"
+          phone: "123456789",
         },
         guestName: "Jan Kowalski",
         guestEmail: "jan@example.com",
-        guestPhone: "123456789"
+        guestPhone: "123456789",
       },
       {
         id: 2,
-        date: "2025-09-26", 
+        date: "2025-09-26",
         time: "14:00",
         status: "confirmed",
         service: "Czyszczenie fotela",
@@ -90,11 +94,11 @@ admin.get("/appointments", adminMiddleware(), async (c) => {
           firstName: "Anna",
           lastName: "Nowak",
           email: "anna@example.com",
-          phone: "987654321"
+          phone: "987654321",
         },
         guestName: "Anna Nowak",
         guestEmail: "anna@example.com",
-        guestPhone: "987654321"
+        guestPhone: "987654321",
       },
     ]);
   } catch (error) {
@@ -185,12 +189,16 @@ admin.get("/dashboard", adminMiddleware(), async (c) => {
 admin.get("/db-status", adminMiddleware(), async (c) => {
   try {
     const db = c.env.DB;
-    
+
     // Check if tables exist
-    const tables = await db.prepare(`
+    const tables = await db
+      .prepare(
+        `
       SELECT name FROM sqlite_master WHERE type='table';
-    `).all();
-    
+    `
+      )
+      .all();
+
     // Count records in each table
     const counts: Record<string, any> = {};
     if (tables.results) {
@@ -200,15 +208,15 @@ admin.get("/db-status", adminMiddleware(), async (c) => {
           const count = await db.prepare(`SELECT COUNT(*) as count FROM ${tableName}`).first();
           counts[tableName] = (count as any)?.count || 0;
         } catch (e) {
-          counts[(table as any).name] = 'Error';
+          counts[(table as any).name] = "Error";
         }
       }
     }
-    
+
     return c.json({
       tables: tables.results || [],
       counts,
-      environment: c.env.ENVIRONMENT
+      environment: c.env.ENVIRONMENT,
     });
   } catch (error) {
     console.error("DB status error:", error);
