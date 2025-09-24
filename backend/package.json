@@ -2,13 +2,11 @@
   "name": "odnowakanapowa-backend",
   "version": "1.0.0",
   "description": "Backend for Odnowa Kanapowa application",
-  "main": "src/index.ts",
+  "main": "src/worker-simple.ts",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir ./dist",
-    "db:generate": "bun run src/db/migrate.ts",
-    "db:seed": "bun run src/db/seed.ts"
+    "dev": "bun run --watch src/worker-simple.ts",
+    "start": "bun run src/worker-simple.ts",
+    "build": "bun build src/worker-simple.ts --outdir ./dist"
   },
   "dependencies": {
     "hono": "^4.6.3"
