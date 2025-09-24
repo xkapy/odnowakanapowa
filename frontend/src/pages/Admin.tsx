@@ -92,18 +92,24 @@ export default function Admin() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Admin appointments response:", data);
+        console.log("Is array?", Array.isArray(data));
+
         // Sprawdź czy data jest tablicą, jeśli nie to weź appointments z obiektu
         if (Array.isArray(data)) {
+          console.log("Setting appointments from array:", data);
           setAppointments(data);
           // Extract occupied dates
           const occupied = data.map((apt: any) => format(new Date(apt.date), "yyyy-MM-dd")).filter((date: string, index: number, self: string[]) => self.indexOf(date) === index);
           setOccupiedDates(occupied);
         } else if (data.appointments && Array.isArray(data.appointments)) {
+          console.log("Setting appointments from object.appointments:", data.appointments);
           setAppointments(data.appointments);
           // Extract occupied dates
           const occupied = data.appointments.map((apt: any) => format(new Date(apt.date), "yyyy-MM-dd")).filter((date: string, index: number, self: string[]) => self.indexOf(date) === index);
           setOccupiedDates(occupied);
         } else {
+          console.log("No valid appointments data found:", data);
           setAppointments([]);
           setOccupiedDates([]);
           setError("Nieprawidłowy format danych");
@@ -412,132 +418,140 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {appointments.map((appointment) => (
-                    <tr key={appointment.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {appointment.user.firstName} {appointment.user.lastName}
-                            {Boolean(appointment.isGuest) && <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Gość</span>}
-                          </div>
-                          <div className="text-sm text-gray-500">{appointment.user.email}</div>
-                          {Boolean(appointment.isGuest) && appointment.user.phone && appointment.user.phone !== "" && <div className="text-sm text-gray-500">{appointment.user.phone}</div>}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {new Date(appointment.date).toLocaleDateString("pl-PL", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </div>
-                        <div className="text-sm text-gray-500">{appointment.time}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {appointment.services.map((service, index) => (
-                            <div key={index} className="mb-1">
-                              {service.quantity > 1 ? `${service.quantity}x ` : ""}
-                              {service.name} - {service.price}
+                  {appointments && appointments.length > 0 ? (
+                    appointments.map((appointment) => (
+                      <tr key={appointment.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {appointment.user?.firstName || "Brak"} {appointment.user?.lastName || "danych"}
+                              {Boolean(appointment.isGuest) && <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Gość</span>}
                             </div>
-                          ))}
-                        </div>
-                        {appointment.description && (
-                          <div className="text-sm text-gray-500 mt-2">
-                            <strong>Opis:</strong> {appointment.description}
+                            <div className="text-sm text-gray-500">{appointment.user?.email || "Brak emaila"}</div>
+                            {Boolean(appointment.isGuest) && appointment.user?.phone && appointment.user?.phone !== "" && <div className="text-sm text-gray-500">{appointment.user.phone}</div>}
                           </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(appointment.status)}`}>{getStatusText(appointment.status)}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        {appointment.status === "pending" && (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => startEditingAppointment(appointment)}
-                              className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Edytuj
-                            </button>
-                            <button
-                              onClick={() => updateAppointmentStatus(appointment.id, "confirmed")}
-                              className="text-sm text-green-600 bg-green-100 hover:bg-green-200 border-1 border-green-400 hover:border-green-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Potwierdź
-                            </button>
-                            <button
-                              onClick={() => updateAppointmentStatus(appointment.id, "cancelled")}
-                              className="text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 border-1 border-gray-400 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Anuluj
-                            </button>
-                            <button
-                              onClick={() => deleteAppointment(appointment.id)}
-                              disabled={deletingAppointment === appointment.id}
-                              className={`text-sm px-2 py-1 rounded-md transition-colors ${
-                                deletingAppointment === appointment.id
-                                  ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
-                                  : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300 cursor-pointer"
-                              }`}
-                            >
-                              {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
-                            </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {new Date(appointment.date).toLocaleDateString("pl-PL", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
                           </div>
-                        )}
-                        {appointment.status === "confirmed" && (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => startEditingAppointment(appointment)}
-                              className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Edytuj
-                            </button>
-                            <button
-                              onClick={() => updateAppointmentStatus(appointment.id, "cancelled")}
-                              className="text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 border-1 border-gray-400 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Anuluj
-                            </button>
-                            <button
-                              onClick={() => deleteAppointment(appointment.id)}
-                              disabled={deletingAppointment === appointment.id}
-                              className={`text-sm px-2 py-1 rounded-md transition-colors ${
-                                deletingAppointment === appointment.id
-                                  ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
-                                  : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300 cursor-pointer"
-                              }`}
-                            >
-                              {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
-                            </button>
+                          <div className="text-sm text-gray-500">{appointment.time}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {appointment.services.map((service, index) => (
+                              <div key={index} className="mb-1">
+                                {service.quantity > 1 ? `${service.quantity}x ` : ""}
+                                {service.name} - {service.price}
+                              </div>
+                            ))}
                           </div>
-                        )}
-                        {appointment.status === "cancelled" && (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => showRestoreDialog(appointment.id)}
-                              className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-400 hover:border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
-                            >
-                              Przywróć
-                            </button>
-                            <button
-                              onClick={() => deleteAppointment(appointment.id)}
-                              disabled={deletingAppointment === appointment.id}
-                              className={`text-sm px-2 py-1 rounded-md transition-colors cursor-pointer ${
-                                deletingAppointment === appointment.id
-                                  ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
-                                  : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300"
-                              }`}
-                            >
-                              {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
-                            </button>
-                          </div>
-                        )}
+                          {appointment.description && (
+                            <div className="text-sm text-gray-500 mt-2">
+                              <strong>Opis:</strong> {appointment.description}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(appointment.status)}`}>{getStatusText(appointment.status)}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {appointment.status === "pending" && (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => startEditingAppointment(appointment)}
+                                className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Edytuj
+                              </button>
+                              <button
+                                onClick={() => updateAppointmentStatus(appointment.id, "confirmed")}
+                                className="text-sm text-green-600 bg-green-100 hover:bg-green-200 border-1 border-green-400 hover:border-green-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Potwierdź
+                              </button>
+                              <button
+                                onClick={() => updateAppointmentStatus(appointment.id, "cancelled")}
+                                className="text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 border-1 border-gray-400 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Anuluj
+                              </button>
+                              <button
+                                onClick={() => deleteAppointment(appointment.id)}
+                                disabled={deletingAppointment === appointment.id}
+                                className={`text-sm px-2 py-1 rounded-md transition-colors ${
+                                  deletingAppointment === appointment.id
+                                    ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
+                                    : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300 cursor-pointer"
+                                }`}
+                              >
+                                {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
+                              </button>
+                            </div>
+                          )}
+                          {appointment.status === "confirmed" && (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => startEditingAppointment(appointment)}
+                                className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Edytuj
+                              </button>
+                              <button
+                                onClick={() => updateAppointmentStatus(appointment.id, "cancelled")}
+                                className="text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 border-1 border-gray-400 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Anuluj
+                              </button>
+                              <button
+                                onClick={() => deleteAppointment(appointment.id)}
+                                disabled={deletingAppointment === appointment.id}
+                                className={`text-sm px-2 py-1 rounded-md transition-colors ${
+                                  deletingAppointment === appointment.id
+                                    ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
+                                    : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300 cursor-pointer"
+                                }`}
+                              >
+                                {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
+                              </button>
+                            </div>
+                          )}
+                          {appointment.status === "cancelled" && (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => showRestoreDialog(appointment.id)}
+                                className="text-sm text-blue-600 bg-blue-100 hover:bg-blue-200 border-1 border-blue-400 hover:border-blue-300 px-2 py-1 rounded-md transition-colors cursor-pointer"
+                              >
+                                Przywróć
+                              </button>
+                              <button
+                                onClick={() => deleteAppointment(appointment.id)}
+                                disabled={deletingAppointment === appointment.id}
+                                className={`text-sm px-2 py-1 rounded-md transition-colors cursor-pointer ${
+                                  deletingAppointment === appointment.id
+                                    ? "text-gray-400 bg-gray-100 border-1 border-gray-200 cursor-not-allowed"
+                                    : "text-red-600 bg-red-100 hover:bg-red-200 border-1 border-red-300"
+                                }`}
+                              >
+                                {deletingAppointment === appointment.id ? "Usuwanie..." : "Usuń"}
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                        Brak wizyt do wyświetlenia
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
