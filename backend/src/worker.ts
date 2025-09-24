@@ -49,7 +49,7 @@ async function initCloudflareDatabase(db: any) {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    
+
     console.log("Database initialized successfully");
   } catch (error) {
     console.error("Database initialization error:", error);
@@ -73,13 +73,7 @@ app.use("*", prettyJSON());
 app.use(
   "*",
   cors({
-    origin: [
-      "http://localhost:5173", 
-      "http://localhost:3000",
-      "https://odnowa-kanapowa-frontend.pages.dev",
-      "https://odnowakanapowa.pl",
-      "https://www.odnowakanapowa.pl"
-    ],
+    origin: ["http://localhost:5173", "http://localhost:3000", "https://odnowa-kanapowa-frontend.pages.dev", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl"],
     credentials: true,
   })
 );
