@@ -7,7 +7,7 @@
     "dev": "bun run --watch src/worker.ts",
     "start": "bun run src/worker.ts",
     "build": "bun build src/worker.ts --outdir ./dist",
-    "deploy": "npx wrangler deploy src/worker.ts"
+    "deploy": "npx wrangler deploy --config wrangler.toml"
   },
   "dependencies": {
     "hono": "^4.6.3",

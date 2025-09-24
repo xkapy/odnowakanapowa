@@ -107,13 +107,4 @@ app.get("/", (c) => {
   });
 });
 
-// Initialize database on first request
-app.use("*", async (c, next) => {
-  if (!c.env.DATABASE_INITIALIZED) {
-    await initCloudflareDatabase(c.env.DB);
-    c.env.DATABASE_INITIALIZED = true;
-  }
-  await next();
-});
-
 export default app;
