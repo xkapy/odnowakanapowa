@@ -11,16 +11,7 @@
     "db:seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^24.5.2",
-    "@types/nodemailer": "^6.4.19",
-    "bcryptjs": "^2.4.3",
-    "hono": "^4.6.3",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.15",
-    "sqlite": "^5.1.1",
-    "zod": "^3.23.8"
+    "hono": "^4.6.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250924.0",
