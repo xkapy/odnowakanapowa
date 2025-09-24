@@ -107,4 +107,12 @@ app.get("/", (c) => {
   });
 });
 
+app.get("/api/test", (c) => {
+  return c.json({
+    message: "API is working!",
+    timestamp: new Date().toISOString(),
+    routes: ["auth", "user", "appointments", "admin", "contact"]
+  });
+});
+
 export default app;
