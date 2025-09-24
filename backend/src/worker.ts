@@ -73,19 +73,12 @@ app.use("*", prettyJSON());
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000", "https://odnowa-kanapowa-frontend.pages.dev", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl"],
-    credentials: true,
-  })
-);
-app.use("*", prettyJSON());
-app.use(
-  "*",
-  cors({
     origin: [
-      "http://localhost:5173",
+      "http://localhost:5173", 
       "http://localhost:3000",
-      "https://odnowa-kanapowa-frontend.pages.dev", // Cloudflare Pages URL
-      "https://odnowakanapowa.pl", // Twoja domena
+      "https://odnowa-kanapowa-frontend.pages.dev",
+      "https://odnowakanapowa.pl",
+      "https://www.odnowakanapowa.pl"
     ],
     credentials: true,
   })
@@ -111,7 +104,7 @@ app.get("/api/test", (c) => {
   return c.json({
     message: "API is working!",
     timestamp: new Date().toISOString(),
-    routes: ["auth", "user", "appointments", "admin", "contact"]
+    routes: ["auth", "user", "appointments", "admin", "contact"],
   });
 });
 

@@ -23,7 +23,7 @@ const registerSchema = z.object({
 // POST /auth/login
 auth.post("/login", zValidator("json", loginSchema), async (c) => {
   const { email, password } = c.req.valid("json");
-  
+
   try {
     // Admin credentials
     if (email === "odnowakanapowa@gmail.com" && password === "Lunislava_17") {
@@ -40,7 +40,7 @@ auth.post("/login", zValidator("json", loginSchema), async (c) => {
         },
       });
     }
-    
+
     return c.json({ error: "Invalid credentials" }, 401);
   } catch (error) {
     console.error("Login error:", error);
@@ -51,19 +51,22 @@ auth.post("/login", zValidator("json", loginSchema), async (c) => {
 // POST /auth/register
 auth.post("/register", zValidator("json", registerSchema), async (c) => {
   const userData = c.req.valid("json");
-  
+
   try {
     // For now, just return success - implement database logic later
-    return c.json({
-      message: "Registration successful",
-      user: {
-        id: 2,
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        isAdmin: false,
+    return c.json(
+      {
+        message: "Registration successful",
+        user: {
+          id: 2,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          isAdmin: false,
+        },
       },
-    }, 201);
+      201
+    );
   } catch (error) {
     console.error("Registration error:", error);
     return c.json({ error: "Internal server error" }, 500);

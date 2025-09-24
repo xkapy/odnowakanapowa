@@ -5,7 +5,7 @@ import type { CloudflareAppContext } from "../types/cloudflare";
 export const authMiddleware = () => {
   return async (c: Context<CloudflareAppContext>, next: Next) => {
     const token = c.req.header("Authorization")?.replace("Bearer ", "");
-    
+
     if (!token) {
       return c.json({ error: "No token provided" }, 401);
     }
@@ -22,7 +22,7 @@ export const authMiddleware = () => {
 export const adminMiddleware = () => {
   return async (c: Context<CloudflareAppContext>, next: Next) => {
     const token = c.req.header("Authorization")?.replace("Bearer ", "");
-    
+
     if (token !== "admin-token-123") {
       return c.json({ error: "Admin access required" }, 403);
     }
