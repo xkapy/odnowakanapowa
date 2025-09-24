@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 import Calendar from "../components/Calendar";
 
 interface Appointment {
@@ -61,7 +62,7 @@ export default function Admin() {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/admin/check", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/check`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +84,7 @@ export default function Admin() {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3001/api/admin/appointments", {
+      const response = await fetch(`${API_BASE_URL}/api/admin/appointments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -119,7 +120,7 @@ export default function Admin() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/appointments/services");
+      const response = await fetch(`${API_BASE_URL}/api/appointments/services`);
       if (response.ok) {
         const data = await response.json();
         setAvailableServices(data.services || []);
@@ -152,7 +153,7 @@ export default function Admin() {
 
   const fetchAvailableTimeSlots = async (date: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/appointments/available/${date}`);
+      const response = await fetch(`${API_BASE_URL}/api/appointments/available/${date}`);
       if (response.ok) {
         const data = await response.json();
         setAvailableTimeSlots(data.availableSlots || []);
@@ -195,7 +196,7 @@ export default function Admin() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/admin/appointments/${editingAppointment}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/appointments/${editingAppointment}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -250,7 +251,7 @@ export default function Admin() {
     setSuccess("");
 
     try {
-      const response = await fetch(`http://localhost:3001/api/admin/appointments/${appointmentId}/status`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/appointments/${appointmentId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -305,7 +306,7 @@ export default function Admin() {
     console.log("Starting delete request for appointment:", appointmentId);
 
     try {
-      const response = await fetch(`http://localhost:3001/api/admin/appointments/${appointmentId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/appointments/${appointmentId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

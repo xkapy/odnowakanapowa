@@ -73,13 +73,7 @@ app.use("*", prettyJSON());
 app.use(
   "*",
   cors({
-    origin: [
-      "http://localhost:5173", 
-      "http://localhost:3000",
-      "https://odnowa-kanapowa-frontend.pages.dev",
-      "https://odnowakanapowa.pl",
-      "https://www.odnowakanapowa.pl"
-    ],
+    origin: ["http://localhost:5173", "http://localhost:3000", "https://odnowa-kanapowa-frontend.pages.dev", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl"],
     credentials: true,
   })
 );

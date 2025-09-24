@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../config/api";
 import { Link } from "react-router-dom";
 
 interface User {
@@ -60,7 +61,7 @@ const Profile = () => {
 
   const fetchUserData = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:3001/api/user/profile", {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -79,7 +80,7 @@ const Profile = () => {
 
   const fetchAppointments = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:3001/api/user/appointments", {
+      const response = await fetch(`${API_BASE_URL}/api/user/appointments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -130,7 +131,7 @@ const Profile = () => {
       if (field === "email") updateData.email = editValues.email;
       if (field === "phone") updateData.phone = editValues.phone;
 
-      const response = await fetch("http://localhost:3001/api/user/profile", {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -196,7 +197,7 @@ const Profile = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3001/api/user/change-password", {
+      const response = await fetch(`${API_BASE_URL}/api/user/change-password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -255,7 +256,7 @@ const Profile = () => {
 
     try {
       console.log("Making DELETE request to backend...");
-      const response = await fetch("http://localhost:3001/api/user/delete-profile", {
+      const response = await fetch(`${API_BASE_URL}/api/user/delete-profile`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

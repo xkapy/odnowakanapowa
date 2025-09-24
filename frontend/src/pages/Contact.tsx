@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuMailOpen, LuMessagesSquare, LuCopy, LuPhone } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 const Contact = () => {
   const [errors, setErrors] = useState<{ email?: string; phone?: string; general?: string }>({});
@@ -27,7 +28,7 @@ const Contact = () => {
 
   const fetchUserData = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:3001/api/contact/user-data", {
+      const response = await fetch(`${API_BASE_URL}/api/contact/user-data`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -87,7 +88,7 @@ const Contact = () => {
     setErrors({});
 
     try {
-      const response = await fetch("http://localhost:3001/api/contact", {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

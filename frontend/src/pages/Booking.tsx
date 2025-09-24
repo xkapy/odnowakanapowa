@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Calendar from "../components/Calendar";
+import { API_BASE_URL } from "../config/api";
 import { furniture, mattress, vehicle, other } from "../data/data";
 
 interface SelectedService {
@@ -67,7 +68,7 @@ const Booking = () => {
 
   const fetchAvailableSlots = async (date: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/appointments/available/${date}`);
+      const response = await fetch(`${API_BASE_URL}/api/appointments/available/${date}`);
       if (response.ok) {
         const data = await response.json();
         setAvailableSlots(data.availableSlots);
@@ -84,7 +85,7 @@ const Booking = () => {
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 3);
 
-      const response = await fetch(`http://localhost:3001/api/appointments/occupied-dates?endDate=${endDate.toISOString().split("T")[0]}`);
+      const response = await fetch(`${API_BASE_URL}/api/appointments/occupied-dates?endDate=${endDate.toISOString().split("T")[0]}`);
       if (response.ok) {
         const data = await response.json();
         setOccupiedDates(data.occupiedDates || []);
@@ -176,7 +177,7 @@ const Booking = () => {
         };
 
     try {
-      const endpoint = isGuest ? "http://localhost:3001/api/appointments/guest" : "http://localhost:3001/api/appointments";
+      const endpoint = isGuest ? `${API_BASE_URL}/api/appointments/guest` : `${API_BASE_URL}/api/appointments`;
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
