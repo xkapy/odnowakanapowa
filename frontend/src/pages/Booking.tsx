@@ -68,10 +68,10 @@ const Booking = () => {
 
   const fetchAvailableSlots = async (date: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/appointments/available/${date}`);
+      const response = await fetch(`${API_BASE_URL}/api/appointments/available-times/${date}`);
       if (response.ok) {
         const data = await response.json();
-        setAvailableSlots(data.availableSlots);
+        setAvailableSlots(data.availableTimes);
         setSelectedTime(""); // Reset selected time when date changes
       }
     } catch (err) {
@@ -163,7 +163,7 @@ const Booking = () => {
       ? {
           date: selectedDate,
           time: selectedTime,
-          serviceIds: selectedServices,
+          serviceIds: selectedServices.map(s => s.id),
           comment: comment.trim() || null,
           guestName: `${guestData.firstName} ${guestData.lastName}`,
           guestEmail: guestData.email,
@@ -172,7 +172,7 @@ const Booking = () => {
       : {
           date: selectedDate,
           time: selectedTime,
-          serviceIds: selectedServices,
+          serviceIds: selectedServices.map(s => s.id),
           comment: comment.trim() || null,
         };
 

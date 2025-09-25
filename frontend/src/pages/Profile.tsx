@@ -126,11 +126,13 @@ const Profile = () => {
 
     setUpdateLoading(true);
     try {
-      const updateData: any = {};
-      if (field === "firstName") updateData.firstName = editValues.firstName;
-      if (field === "lastName") updateData.lastName = editValues.lastName;
-      if (field === "email") updateData.email = editValues.email;
-      if (field === "phone") updateData.phone = editValues.phone;
+      // Send all user data, but update only the edited field
+      const updateData = {
+        firstName: field === "firstName" ? editValues.firstName : user.firstName,
+        lastName: field === "lastName" ? editValues.lastName : user.lastName,
+        email: field === "email" ? editValues.email : user.email,
+        phone: field === "phone" ? editValues.phone : user.phone,
+      };
 
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: "PUT",
@@ -142,11 +144,19 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        const updatedUser = await response.json();
-        setUser(updatedUser.user);
+        // Update user data in state with the new values
+        const updatedUser = {
+          ...user,
+          firstName: updateData.firstName,
+          lastName: updateData.lastName,
+          email: updateData.email,
+          phone: updateData.phone,
+        };
+        
+        setUser(updatedUser);
 
         // Update localStorage
-        localStorage.setItem("user", JSON.stringify(updatedUser.user));
+        localStorage.setItem("user", JSON.stringify(updatedUser));
 
         // Dispatch custom event to update navbar
         window.dispatchEvent(new Event("authChange"));
