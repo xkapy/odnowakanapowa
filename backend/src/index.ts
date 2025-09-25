@@ -205,7 +205,7 @@ app.get("/api/user/profile", authMiddleware, async (c: any) => {
         phone: user.phone,
         isAdmin: user.is_admin,
         role: user.is_admin ? "admin" : "user",
-      }
+      },
     });
   } catch (error) {
     console.error("Profile error:", error);
@@ -249,6 +249,14 @@ const adminMiddleware = async (c: any, next: any) => {
 
   await next();
 };
+
+// Admin - check access
+app.get("/api/admin/check", adminMiddleware, async (c) => {
+  return c.json({ 
+    success: true, 
+    message: "Uprawnienia administratora potwierdzone" 
+  });
+});
 
 // Admin - get all appointments
 app.get("/api/admin/appointments", adminMiddleware, async (c) => {
