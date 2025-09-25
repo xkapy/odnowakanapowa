@@ -159,10 +159,10 @@ export default function Admin() {
 
   const fetchAvailableTimeSlots = async (date: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/appointments/available/${date}`);
+      const response = await fetch(`${API_BASE_URL}/api/appointments/available-times/${date}`);
       if (response.ok) {
         const data = await response.json();
-        setAvailableTimeSlots(data.availableSlots || []);
+        setAvailableTimeSlots(data.availableTimes || []);
       }
     } catch (err) {
       console.error("Error fetching time slots:", err);
