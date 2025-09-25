@@ -567,6 +567,23 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
   }
 });
 
+// Test endpoint to check appointment services with quantities
+app.get("/api/test/appointment/:id/services", async (c) => {
+  try {
+    const appointmentId = c.req.param("id");
+    const appointmentIdNum = parseInt(appointmentId);
+    const services = await getAppointmentServices(c.env.DB, [appointmentIdNum]);
+    return c.json({
+      appointmentId: appointmentId,
+      services: services[appointmentIdNum] || [],
+      allData: services,
+    });
+  } catch (error) {
+    console.error("Test appointment services error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
 // Admin - Update appointment details
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
   try {
