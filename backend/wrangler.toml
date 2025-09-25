@@ -1,4 +1,4 @@
-name = "odnowa-kanapowa-api"
+name = "odnowa-kanapowa-backend"
 main = "src/index.ts"
 compatibility_date = "2024-10-25"
 compatibility_flags = ["nodejs_compat"]
@@ -8,7 +8,7 @@ route = { pattern = "api.odnowakanapowa.pl/*", zone_name = "odnowakanapowa.pl" }
 
 [vars]
 ENVIRONMENT = "production"
-JWT_SECRET = "your-super-secret-jwt-key-change-this-in-production-2024"
+JWT_SECRET = "e6773055dac6000e87870df47eb3e7bff8a030fb1f03d2c933e23bcc125d4c5a72e52a261ffe695c308b55d1b3b86a0b4e5116b358d554afb32c6f2428f27988"
 
 [[d1_databases]]
 binding = "DB"
@@ -16,11 +16,11 @@ database_name = "odnowa-kanapowa-db"
 database_id = "224216c4-7a70-4ce7-999a-84e84b77b294"
 
 [env.development]
-name = "odnowa-kanapowa-api-dev"
+name = "odnowa-kanapowa-backend-dev"
 
 [env.development.vars]
 ENVIRONMENT = "development"
-JWT_SECRET = "dev-jwt-secret-key-2024"
+JWT_SECRET = "e6773055dac6000e87870df47eb3e7bff8a030fb1f03d2c933e23bcc125d4c5a72e52a261ffe695c308b55d1b3b86a0b4e5116b358d554afb32c6f2428f27988"
 
 [[env.development.d1_databases]]
 binding = "DB"

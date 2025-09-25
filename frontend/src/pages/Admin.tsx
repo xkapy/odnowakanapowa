@@ -12,7 +12,7 @@ interface Appointment {
   description?: string;
   isGuest?: boolean;
   guestName?: string;
-  guestEmail?: string; 
+  guestEmail?: string;
   guestPhone?: string;
   user: {
     id: number | null;
@@ -444,24 +444,12 @@ export default function Admin() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-gray-900">
-                              {appointment.isGuest 
-                                ? appointment.guestName || "Brak danych"
-                                : `${appointment.user?.firstName || "Brak"} ${appointment.user?.lastName || "danych"}`
-                              }
+                              {appointment.isGuest ? appointment.guestName || "Brak danych" : `${appointment.user?.firstName || "Brak"} ${appointment.user?.lastName || "danych"}`}
                               {Boolean(appointment.isGuest) && <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Gość</span>}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {appointment.isGuest 
-                                ? appointment.guestEmail || "Brak emaila"
-                                : appointment.user?.email || "Brak emaila"
-                              }
-                            </div>
-                            {appointment.isGuest && appointment.guestPhone && (
-                              <div className="text-sm text-gray-500">{appointment.guestPhone}</div>
-                            )}
-                            {!appointment.isGuest && appointment.user?.phone && appointment.user.phone !== "" && (
-                              <div className="text-sm text-gray-500">{appointment.user.phone}</div>
-                            )}
+                            <div className="text-sm text-gray-500">{appointment.isGuest ? appointment.guestEmail || "Brak emaila" : appointment.user?.email || "Brak emaila"}</div>
+                            {appointment.isGuest && appointment.guestPhone && <div className="text-sm text-gray-500">{appointment.guestPhone}</div>}
+                            {!appointment.isGuest && appointment.user?.phone && appointment.user.phone !== "" && <div className="text-sm text-gray-500">{appointment.user.phone}</div>}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
