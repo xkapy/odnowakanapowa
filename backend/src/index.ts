@@ -629,7 +629,9 @@ app.get("/api/test/appointment/:id/services", async (c) => {
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
   try {
     const appointmentId = c.req.param("id");
-    const { date, time, description, status } = await c.req.json();
+    const { date, time, description, status, services } = await c.req.json();
+
+    console.log("🔄 Updating appointment:", appointmentId, "with data:", { date, time, services });
 
     if (!date || !time) {
       return c.json({ error: "Data i godzina są wymagane" }, 400);
@@ -642,9 +644,28 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
     }
 
+    // Update appointment basic info
     await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(date, time, description || "", status || "pending", appointmentId)
       .run();
+
+    // Update appointment services if provided
+    if (services && Array.isArray(services)) {
+      console.log("🔄 Updating services for appointment:", appointmentId, services);
+      
+      // Delete existing services
+      await c.env.DB.prepare("DELETE FROM appointment_services WHERE appointment_id = ?").bind(appointmentId).run();
+
+      // Insert new services
+      for (const service of services) {
+        if (service.id && service.quantity && service.quantity > 0) {
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+            .bind(appointmentId, service.id, service.quantity)
+            .run();
+          console.log("✅ Added service:", service.id, "quantity:", service.quantity);
+        }
+      }
+    }
 
     return c.json({
       success: true,
