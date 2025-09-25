@@ -35,7 +35,7 @@ const createEmailTransporter = (adminEmail: string, appPassword: string) => {
 
 // Email templates
 // Email for user - appointment pending approval
-const getAppointmentPendingEmail = (firstName: string, date: string, time: string, services: string[]) => {
+const getAppointmentPendingEmail = (firstName: string, date: string, time: string, services: {name: string, price: number, quantity: number}[], total: number) => {
   return {
     subject: 'Rezerwacja złożona - oczekuje na potwierdzenie - Odnowa Kanapowa',
     html: `
@@ -43,26 +43,23 @@ const getAppointmentPendingEmail = (firstName: string, date: string, time: strin
         <h2 style="color: #2D5A27;">Rezerwacja złożona - Odnowa Kanapowa</h2>
         <p>Dzień dobry ${firstName},</p>
         <p>Dziękujemy za złożenie rezerwacji. Twoja wizyta została zarejestrowana i <strong>oczekuje na potwierdzenie</strong> przez nasz zespół.</p>
-        
         <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="color: #856404; margin-top: 0;">⏳ Status: Oczekuje na potwierdzenie</h3>
+          <h3 style="color: #856404; margin-top: 0;">Status: Oczekuje na potwierdzenie</h3>
           <p style="color: #856404;">Skontaktujemy się z Tobą wkrótce w celu potwierdzenia terminu.</p>
         </div>
-        
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="color: #2D5A27; margin-top: 0;">Szczegóły rezerwacji:</h3>
           <p><strong>Data:</strong> ${date}</p>
           <p><strong>Godzina:</strong> ${time}</p>
           <p><strong>Usługi:</strong></p>
           <ul>
-            ${services.map(service => `<li>${service}</li>`).join('')}
+            ${services.map(service => `<li>${service.name} (${service.quantity}x) - ${service.price * service.quantity} zł</li>`).join('')}
           </ul>
+          <p><strong>Łączna cena:</strong> ${total} zł</p>
         </div>
-        
         <p>W razie pytań prosimy o kontakt:</p>
-        <p>📞 <strong>Telefon:</strong> +48 123 456 789</p>
-        <p>📧 <strong>Email:</strong> kontakt@odnowakanapowa.pl</p>
-        
+        <p><strong>Telefon:</strong> +48 785 922 680</p>
+        <p><strong>Email:</strong> odnowakanapowa@gmail.com</p>
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
         <p style="color: #6c757d; font-size: 14px;">
           Wiadomość została wysłana automatycznie. Prosimy nie odpowiadać na ten email.
@@ -73,34 +70,31 @@ const getAppointmentPendingEmail = (firstName: string, date: string, time: strin
 };
 
 // Email for user - appointment confirmed
-const getAppointmentConfirmationEmail = (firstName: string, date: string, time: string, services: string[]) => {
+const getAppointmentConfirmationEmail = (firstName: string, date: string, time: string, services: {name: string, price: number, quantity: number}[], total: number) => {
   return {
     subject: 'Wizyta potwierdzona! - Odnowa Kanapowa',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2D5A27;">✅ Wizyta potwierdzona! - Odnowa Kanapowa</h2>
+        <h2 style="color: #2D5A27;">Wizyta potwierdzona! - Odnowa Kanapowa</h2>
         <p>Dzień dobry ${firstName},</p>
         <p><strong>Świetne wieści!</strong> Twoja wizyta została oficjalnie potwierdzona.</p>
-        
         <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="color: #155724; margin-top: 0;">✅ Status: Potwierdzona</h3>
+          <h3 style="color: #155724; margin-top: 0;">Status: Potwierdzona</h3>
           <p style="color: #155724;">Twoja wizyta została zatwierdzona. Czekamy na Ciebie!</p>
         </div>
-        
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="color: #2D5A27; margin-top: 0;">Szczegóły wizyty:</h3>
           <p><strong>Data:</strong> ${date}</p>
           <p><strong>Godzina:</strong> ${time}</p>
           <p><strong>Usługi:</strong></p>
           <ul>
-            ${services.map(service => `<li>${service}</li>`).join('')}
+            ${services.map(service => `<li>${service.name} (${service.quantity}x) - ${service.price * service.quantity} zł</li>`).join('')}
           </ul>
+          <p><strong>Łączna cena:</strong> ${total} zł</p>
         </div>
-        
         <p>W razie pytań prosimy o kontakt:</p>
-        <p>📞 <strong>Telefon:</strong> +48 123 456 789</p>
-        <p>📧 <strong>Email:</strong> kontakt@odnowakanapowa.pl</p>
-        
+        <p><strong>Telefon:</strong> +48 785 922 680</p>
+        <p><strong>Email:</strong> odnowakanapowa@gmail.com</p>
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
         <p style="color: #6c757d; font-size: 14px;">
           Wiadomość została wysłana automatycznie. Prosimy nie odpowiadać na ten email.
@@ -111,19 +105,17 @@ const getAppointmentConfirmationEmail = (firstName: string, date: string, time: 
 };
 
 // Email for admin - new appointment notification
-const getNewAppointmentNotificationEmail = (customerName: string, customerEmail: string, customerPhone: string | null, date: string, time: string, services: string[], isGuest: boolean = false) => {
+const getNewAppointmentNotificationEmail = (customerName: string, customerEmail: string, customerPhone: string | null, date: string, time: string, services: {name: string, price: number, quantity: number}[], total: number, isGuest: boolean = false) => {
   return {
     subject: `Nowa rezerwacja wizyty od ${customerName} - ${date} ${time}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2D5A27;">🔔 Nowa rezerwacja wizyty</h2>
+        <h2 style="color: #2D5A27;">Nowa rezerwacja wizyty</h2>
         <p>Otrzymano nową rezerwację wizyty, która oczekuje na potwierdzenie w panelu administratora.</p>
-        
         <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="color: #856404; margin-top: 0;">⚠️ Wymagana akcja</h3>
+          <h3 style="color: #856404; margin-top: 0;">Wymagana akcja</h3>
           <p style="color: #856404;">Zaloguj się do panelu administratora, aby potwierdzić lub odrzucić rezerwację.</p>
         </div>
-        
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="color: #2D5A27; margin-top: 0;">Dane klienta:</h3>
           <p><strong>Imię:</strong> ${customerName}</p>
@@ -131,23 +123,21 @@ const getNewAppointmentNotificationEmail = (customerName: string, customerEmail:
           ${customerPhone ? `<p><strong>Telefon:</strong> ${customerPhone}</p>` : ''}
           <p><strong>Typ konta:</strong> ${isGuest ? 'Gość (bez konta)' : 'Zarejestrowany użytkownik'}</p>
         </div>
-        
         <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="color: #1565c0; margin-top: 0;">Szczegóły wizyty:</h3>
           <p><strong>Data:</strong> ${date}</p>
           <p><strong>Godzina:</strong> ${time}</p>
           <p><strong>Usługi:</strong></p>
           <ul>
-            ${services.map(service => `<li>${service}</li>`).join('')}
+            ${services.map(service => `<li>${service.name} (${service.quantity}x) - ${service.price * service.quantity} zł</li>`).join('')}
           </ul>
+          <p><strong>Łączna cena:</strong> ${total} zł</p>
         </div>
-        
         <div style="text-align: center; margin: 30px 0;">
           <a href="https://odnowakanapowa.pl/admin" style="background-color: #2D5A27; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
             Przejdź do panelu administratora
           </a>
         </div>
-        
         <p style="color: #6c757d; font-size: 14px;">
           Powiadomienie zostało wysłane automatycznie z systemu rezerwacji Odnowa Kanapowa.
         </p>
@@ -747,43 +737,46 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
       
       if (user) {
         // Get service names for email
-        const serviceNames: string[] = [];
+        // Pobierz szczegóły usług z bazy
+        let serviceObjs: {name: string, price: number, quantity: number}[] = [];
+        let total = 0;
         if (services && Array.isArray(services)) {
           for (const service of services) {
-            // Get service name from DB
-            const serviceResult = await c.env.DB.prepare("SELECT name FROM services WHERE id = ?").bind(service.id).first();
+            const serviceResult = await c.env.DB.prepare("SELECT name, price FROM services WHERE id = ?").bind(service.id).first();
             if (serviceResult && typeof serviceResult.name === 'string') {
-              serviceNames.push(`${serviceResult.name} (${service.quantity || 1}x)`);
+              const obj = { name: serviceResult.name, price: serviceResult.price, quantity: service.quantity || 1 };
+              serviceObjs.push(obj);
+              total += obj.price * obj.quantity;
             }
           }
         } else if (serviceIds && Array.isArray(serviceIds)) {
           for (const serviceId of serviceIds) {
-            const serviceResult = await c.env.DB.prepare("SELECT name FROM services WHERE id = ?").bind(serviceId).first();
+            const serviceResult = await c.env.DB.prepare("SELECT name, price FROM services WHERE id = ?").bind(serviceId).first();
             if (serviceResult && typeof serviceResult.name === 'string') {
-              serviceNames.push(serviceResult.name);
+              const obj = { name: serviceResult.name, price: serviceResult.price, quantity: 1 };
+              serviceObjs.push(obj);
+              total += obj.price;
             }
           }
         }
-        
         const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
-        
         // Send pending email to user
-        const userEmailTemplate = getAppointmentPendingEmail(user.first_name, date, time, serviceNames);
+        const userEmailTemplate = getAppointmentPendingEmail(user.first_name, date, time, serviceObjs, total);
         await transporter.sendMail({
           from: c.env.ADMIN_EMAIL,
           to: user.email,
           subject: userEmailTemplate.subject,
           html: userEmailTemplate.html,
         });
-        
         // Send notification to admin
         const adminEmailTemplate = getNewAppointmentNotificationEmail(
-          user.first_name, 
-          user.email, 
-          user.phone || null, 
-          date, 
-          time, 
-          serviceNames, 
+          user.first_name,
+          user.email,
+          user.phone || null,
+          date,
+          time,
+          serviceObjs,
+          total,
           false // not a guest
         );
         await transporter.sendMail({
@@ -792,7 +785,6 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
           subject: adminEmailTemplate.subject,
           html: adminEmailTemplate.html,
         });
-        
         console.log(`Appointment pending email sent to ${user.email} and notification sent to admin`);
       }
     } catch (emailError) {
@@ -865,43 +857,46 @@ app.post("/api/appointments/guest", async (c) => {
     // Send appointment notification emails to guest and admin
     try {
       // Get service names for email
-      const serviceNames: string[] = [];
+      // Pobierz szczegóły usług z bazy
+      let serviceObjs: {name: string, price: number, quantity: number}[] = [];
+      let total = 0;
       if (services && Array.isArray(services)) {
         for (const service of services) {
-          // Get service name from DB
-          const serviceResult = await c.env.DB.prepare("SELECT name FROM services WHERE id = ?").bind(service.id).first();
+          const serviceResult = await c.env.DB.prepare("SELECT name, price FROM services WHERE id = ?").bind(service.id).first();
           if (serviceResult && typeof serviceResult.name === 'string') {
-            serviceNames.push(`${serviceResult.name} (${service.quantity || 1}x)`);
+            const obj = { name: serviceResult.name, price: Number(serviceResult.price), quantity: service.quantity || 1 };
+            serviceObjs.push(obj);
+            total += obj.price * obj.quantity;
           }
         }
       } else if (serviceIds && Array.isArray(serviceIds)) {
         for (const serviceId of serviceIds) {
-          const serviceResult = await c.env.DB.prepare("SELECT name FROM services WHERE id = ?").bind(serviceId).first();
+          const serviceResult = await c.env.DB.prepare("SELECT name, price FROM services WHERE id = ?").bind(serviceId).first();
           if (serviceResult && typeof serviceResult.name === 'string') {
-            serviceNames.push(serviceResult.name);
+            const obj = { name: serviceResult.name, price: Number(serviceResult.price), quantity: 1 };
+            serviceObjs.push(obj);
+            total += obj.price;
           }
         }
       }
-      
       const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
-      
       // Send pending email to guest
-      const guestEmailTemplate = getAppointmentPendingEmail(guestName.split(' ')[0], date, time, serviceNames);
+      const guestEmailTemplate = getAppointmentPendingEmail(guestName.split(' ')[0], date, time, serviceObjs, total);
       await transporter.sendMail({
         from: c.env.ADMIN_EMAIL,
         to: guestEmail,
         subject: guestEmailTemplate.subject,
         html: guestEmailTemplate.html,
       });
-      
       // Send notification to admin
       const adminEmailTemplate = getNewAppointmentNotificationEmail(
-        guestName, 
-        guestEmail, 
-        guestPhone, 
-        date, 
-        time, 
-        serviceNames, 
+        guestName,
+        guestEmail,
+        guestPhone,
+        date,
+        time,
+        serviceObjs,
+        total,
         true // is a guest
       );
       await transporter.sendMail({
@@ -910,7 +905,6 @@ app.post("/api/appointments/guest", async (c) => {
         subject: adminEmailTemplate.subject,
         html: adminEmailTemplate.html,
       });
-      
       console.log(`Guest appointment pending email sent to ${guestEmail} and notification sent to admin`);
     } catch (emailError) {
       console.error('Error sending guest appointment notification emails:', emailError);
@@ -996,33 +990,33 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
         const appointmentIdNum = parseInt(appointmentId);
         const servicesData = await getAppointmentServices(c.env.DB, [appointmentIdNum]);
         const appointmentServices = servicesData[appointmentIdNum] || [];
-        const serviceNames = appointmentServices.map(service => 
-          `${service.name} (${service.quantity}x)`
-        );
-
+        // Przygotuj szczegóły usług i sumę
+        const serviceObjs: {name: string, price: number, quantity: number}[] = (appointmentServices || []).map((service: any) => ({
+          name: service.name,
+          price: service.price,
+          quantity: service.quantity
+        }));
+        const total = serviceObjs.reduce((sum, s) => sum + s.price * s.quantity, 0);
         const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
-        
         // Determine recipient email and name
         const recipientEmail = (appointment.user_email || appointment.guest_email) as string;
         const guestName = appointment.guest_name as string;
         const firstName = appointment.first_name as string;
         const recipientName = firstName || (guestName ? guestName.split(' ')[0] : 'Klient');
-        
         if (recipientEmail) {
           const emailTemplate = getAppointmentConfirmationEmail(
-            recipientName, 
-            appointment.date as string, 
-            appointment.time as string, 
-            serviceNames
+            recipientName,
+            appointment.date as string,
+            appointment.time as string,
+            serviceObjs,
+            total
           );
-          
           await transporter.sendMail({
             from: c.env.ADMIN_EMAIL,
             to: recipientEmail,
             subject: emailTemplate.subject,
             html: emailTemplate.html,
           });
-          
           console.log(`Appointment confirmation email sent to ${recipientEmail} after admin approval`);
         }
       } catch (emailError) {
