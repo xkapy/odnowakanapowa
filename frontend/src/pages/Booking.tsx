@@ -28,6 +28,8 @@ const Booking = () => {
     email: "",
     phone: "",
   });
+  const [apiServices, setApiServices] = useState<any[]>([]);
+  const [servicesLoaded, setServicesLoaded] = useState(false);
 
   // Handle scroll to show/hide gradients
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -45,8 +47,39 @@ const Booking = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const token = localStorage.getItem("token");
 
-  // Combine all services from data.ts
-  const allServices = [...furniture, ...mattress, ...vehicle, ...other];
+  // Fetch services from API
+  const fetchServicesFromAPI = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/services`);
+      if (response.ok) {
+        const services = await response.json();
+        console.log("Loaded services from API:", services);
+        setApiServices(services);
+        setServicesLoaded(true);
+      } else {
+        console.error("Failed to fetch services from API");
+        setServicesLoaded(true); // Still set to true to use fallback
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      setServicesLoaded(true); // Still set to true to use fallback
+    }
+  };
+
+  // Use API services if loaded, otherwise fallback to local data
+  const allServices = servicesLoaded && apiServices.length > 0 
+    ? apiServices.map(service => ({
+        id: service.id,
+        name: service.name,
+        price: service.price,
+        description: service.description,
+        quantity: 0 // Will be managed by selectedServices state
+      }))
+    : [...furniture, ...mattress, ...vehicle, ...other];
+
+  useEffect(() => {
+    fetchServicesFromAPI();
+  }, []);
 
   // Filter services based on search term
   const filteredServices = {

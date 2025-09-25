@@ -87,6 +87,17 @@ app.get("/", (c) => {
   });
 });
 
+// Get all services
+app.get("/api/services", async (c) => {
+  try {
+    const services = await c.env.DB.prepare("SELECT id, name, price, description FROM services ORDER BY id").all();
+    return c.json(services.results || []);
+  } catch (error) {
+    console.error("Get services error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
 // Register
 app.post("/api/auth/register", async (c) => {
   try {
