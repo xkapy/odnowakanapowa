@@ -58,7 +58,7 @@ const Register = () => {
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
-        if (data.user) {
+        if (data.user && typeof data.user === "object") {
           localStorage.setItem("user", JSON.stringify(data.user));
         }
 

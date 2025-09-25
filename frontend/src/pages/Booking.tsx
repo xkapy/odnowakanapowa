@@ -44,8 +44,11 @@ const Booking = () => {
     setShowBottomGradient(scrollTop < scrollHeight - clientHeight - 10);
   };
 
-  // Get user and token from localStorage
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  // Get user and token from localStorage safely
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const { safeParseJSON } = require("../utils/safeParseJSON");
+  const user = safeParseJSON(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
 
   // Fetch services from API

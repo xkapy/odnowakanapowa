@@ -29,8 +29,8 @@ const Login = () => {
 
       if (response.ok) {
         // Store token in localStorage (later we'll use proper auth context)
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+          if (data.token) localStorage.setItem("token", data.token);
+          if (data.user && typeof data.user === "object") localStorage.setItem("user", JSON.stringify(data.user));
 
         // Notify other components about auth change
         window.dispatchEvent(new Event("authChange"));

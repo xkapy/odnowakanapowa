@@ -24,10 +24,15 @@ const Navbar = () => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("token");
       const userData = localStorage.getItem("user");
+      // Use safe parse to avoid exceptions if stored string is invalid
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const { safeParseJSON } = require("../../utils/safeParseJSON");
+      const parsedUser = safeParseJSON(userData);
 
-      if (token && userData) {
+      if (token && parsedUser) {
         setIsLoggedIn(true);
-        setUser(JSON.parse(userData));
+        setUser(parsedUser);
       } else {
         setIsLoggedIn(false);
         setUser(null);
