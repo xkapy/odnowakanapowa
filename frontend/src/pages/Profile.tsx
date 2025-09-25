@@ -152,7 +152,7 @@ const Profile = () => {
           email: updateData.email,
           phone: updateData.phone,
         };
-        
+
         setUser(updatedUser);
 
         // Update localStorage

@@ -163,7 +163,7 @@ const Booking = () => {
       ? {
           date: selectedDate,
           time: selectedTime,
-          serviceIds: selectedServices.map(s => s.id),
+          serviceIds: selectedServices.map((s) => s.id),
           comment: comment.trim() || null,
           guestName: `${guestData.firstName} ${guestData.lastName}`,
           guestEmail: guestData.email,
@@ -172,7 +172,7 @@ const Booking = () => {
       : {
           date: selectedDate,
           time: selectedTime,
-          serviceIds: selectedServices.map(s => s.id),
+          serviceIds: selectedServices.map((s) => s.id),
           comment: comment.trim() || null,
         };
 

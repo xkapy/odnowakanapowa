@@ -21,6 +21,48 @@ interface User {
 
 const app = new Hono<{ Bindings: Env }>();
 
+// Helper function to get services for appointments
+const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) => {
+  if (appointmentIds.length === 0) return {};
+  
+  try {
+    const placeholders = appointmentIds.map(() => '?').join(',');
+    const query = `
+      SELECT 
+        aps.appointment_id,
+        s.id,
+        s.name,
+        s.price,
+        s.description
+      FROM appointment_services aps
+      JOIN services s ON aps.service_id = s.id
+      WHERE aps.appointment_id IN (${placeholders})
+    `;
+    
+    const result = await db.prepare(query).bind(...appointmentIds).all();
+    
+    // Group services by appointment_id
+    const servicesByAppointment: { [key: number]: any[] } = {};
+    (result.results || []).forEach((row: any) => {
+      if (!servicesByAppointment[row.appointment_id]) {
+        servicesByAppointment[row.appointment_id] = [];
+      }
+      servicesByAppointment[row.appointment_id].push({
+        id: row.id,
+        name: row.name,
+        price: row.price,
+        description: row.description,
+        quantity: 1 // Default quantity
+      });
+    });
+    
+    return servicesByAppointment;
+  } catch (error) {
+    console.log("Could not load appointment services (table might not exist):", error);
+    return {};
+  }
+};
+
 // CORS
 app.use(
   "*",
@@ -220,6 +262,10 @@ app.get("/api/user/appointments", authMiddleware, async (c: any) => {
 
     const appointments = await c.env.DB.prepare("SELECT * FROM appointments WHERE user_id = ? ORDER BY date DESC, time DESC").bind(userPayload.userId).all();
 
+    // Get appointment IDs for loading services
+    const appointmentIds = (appointments.results || []).map((apt: any) => apt.id);
+    const servicesByAppointment = await getAppointmentServices(c.env.DB, appointmentIds);
+
     // Format appointments to match frontend expectations
     const formattedAppointments = (appointments.results || []).map((apt: any) => ({
       id: apt.id,
@@ -228,7 +274,7 @@ app.get("/api/user/appointments", authMiddleware, async (c: any) => {
       status: apt.status,
       description: apt.description,
       createdAt: apt.created_at,
-      services: [], // Empty array to prevent frontend errors
+      services: servicesByAppointment[apt.id] || [],
     }));
 
     return c.json({ appointments: formattedAppointments });
@@ -275,6 +321,10 @@ app.get("/api/admin/appointments", adminMiddleware, async (c) => {
       `
     ).all();
 
+    // Get appointment IDs for loading services
+    const appointmentIds = (appointments.results || []).map((apt: any) => apt.id);
+    const servicesByAppointment = await getAppointmentServices(c.env.DB, appointmentIds);
+
     const enrichedAppointments = (appointments.results || []).map((apt: any) => ({
       id: apt.id,
       userId: apt.user_id,
@@ -295,7 +345,7 @@ app.get("/api/admin/appointments", adminMiddleware, async (c) => {
             phone: apt.user_phone,
           }
         : undefined,
-      services: [], // TODO: Add services later
+      services: servicesByAppointment[apt.id] || [],
       isGuest: !apt.user_id,
     }));
 
@@ -322,22 +372,17 @@ app.get("/api/appointments/services", async (c) => {
 app.get("/api/appointments/available-times/:date", async (c) => {
   try {
     const date = c.req.param("date");
-    
+
     // Generate time slots from 16:00 to 20:00 every 30 minutes
-    const availableTimes = [
-      "16:00", "16:30", "17:00", "17:30", 
-      "18:00", "18:30", "19:00", "19:30", "20:00"
-    ];
+    const availableTimes = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 
     // Get booked times for this date
-    const bookedAppointments = await c.env.DB.prepare(
-      "SELECT time FROM appointments WHERE date = ? AND status != 'cancelled'"
-    ).bind(date).all();
+    const bookedAppointments = await c.env.DB.prepare("SELECT time FROM appointments WHERE date = ? AND status != 'cancelled'").bind(date).all();
 
     const bookedTimes = (bookedAppointments.results || []).map((apt: any) => apt.time);
-    
+
     // Filter out booked times
-    const freeTimes = availableTimes.filter(time => !bookedTimes.includes(time));
+    const freeTimes = availableTimes.filter((time) => !bookedTimes.includes(time));
 
     return c.json({ availableTimes: freeTimes });
   } catch (error) {
@@ -357,23 +402,37 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
     }
 
     // Check if time slot is available
-    const existingAppointment = await c.env.DB.prepare(
-      "SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'"
-    ).bind(date, time).first();
+    const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'").bind(date, time).first();
 
     if (existingAppointment) {
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
     }
 
     // Create appointment
-    const result = await c.env.DB.prepare(
-      "INSERT INTO appointments (user_id, date, time, description, status, created_at) VALUES (?, ?, ?, ?, 'pending', datetime('now'))"
-    ).bind(userPayload.userId, date, time, comment || "").run();
+    const result = await c.env.DB.prepare("INSERT INTO appointments (user_id, date, time, description, status, created_at) VALUES (?, ?, ?, ?, 'pending', datetime('now'))")
+      .bind(userPayload.userId, date, time, comment || "")
+      .run();
 
-    return c.json({ 
-      success: true, 
+    const appointmentId = result.meta.last_row_id;
+
+    // Save services if provided
+    if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
+      for (const serviceId of serviceIds) {
+        try {
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id) VALUES (?, ?)")
+            .bind(appointmentId, serviceId)
+            .run();
+        } catch (error) {
+          // Table might not exist, continue without error
+          console.log("Could not save appointment service:", error);
+        }
+      }
+    }
+
+    return c.json({
+      success: true,
       message: "Wizyta została zarezerwowana",
-      appointmentId: result.meta.last_row_id 
+      appointmentId: appointmentId,
     });
   } catch (error) {
     console.error("Create appointment error:", error);
@@ -391,9 +450,7 @@ app.post("/api/appointments/guest", async (c) => {
     }
 
     // Check if time slot is available
-    const existingAppointment = await c.env.DB.prepare(
-      "SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'"
-    ).bind(date, time).first();
+    const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'").bind(date, time).first();
 
     if (existingAppointment) {
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
@@ -402,12 +459,30 @@ app.post("/api/appointments/guest", async (c) => {
     // Create guest appointment
     const result = await c.env.DB.prepare(
       "INSERT INTO appointments (guest_name, guest_email, guest_phone, date, time, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'))"
-    ).bind(guestName, guestEmail, guestPhone, date, time, comment || "").run();
+    )
+      .bind(guestName, guestEmail, guestPhone, date, time, comment || "")
+      .run();
 
-    return c.json({ 
-      success: true, 
+    const appointmentId = result.meta.last_row_id;
+
+    // Save services if provided
+    if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
+      for (const serviceId of serviceIds) {
+        try {
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id) VALUES (?, ?)")
+            .bind(appointmentId, serviceId)
+            .run();
+        } catch (error) {
+          // Table might not exist, continue without error
+          console.log("Could not save appointment service:", error);
+        }
+      }
+    }
+
+    return c.json({
+      success: true,
       message: "Wizyta została zarezerwowana",
-      appointmentId: result.meta.last_row_id 
+      appointmentId: appointmentId,
     });
   } catch (error) {
     console.error("Create guest appointment error:", error);
@@ -426,22 +501,20 @@ app.put("/api/user/profile", authMiddleware, async (c: any) => {
     }
 
     // Check if email is already taken by another user
-    const existingUser = await c.env.DB.prepare(
-      "SELECT id FROM users WHERE email = ? AND id != ?"
-    ).bind(email, userPayload.userId).first();
+    const existingUser = await c.env.DB.prepare("SELECT id FROM users WHERE email = ? AND id != ?").bind(email, userPayload.userId).first();
 
     if (existingUser) {
       return c.json({ error: "Ten email jest już używany przez innego użytkownika" }, 400);
     }
 
     // Update user
-    await c.env.DB.prepare(
-      "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?"
-    ).bind(firstName, lastName, email, phone || null, userPayload.userId).run();
+    await c.env.DB.prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?")
+      .bind(firstName, lastName, email, phone || null, userPayload.userId)
+      .run();
 
-    return c.json({ 
-      success: true, 
-      message: "Profil został zaktualizowany"
+    return c.json({
+      success: true,
+      message: "Profil został zaktualizowany",
     });
   } catch (error) {
     console.error("Update profile error:", error);
@@ -455,24 +528,23 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
     const appointmentId = c.req.param("id");
     const { status } = await c.req.json();
 
-    const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+    const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
     if (!validStatuses.includes(status)) {
       return c.json({ error: "Nieprawidłowy status" }, 400);
     }
 
-    await c.env.DB.prepare(
-      "UPDATE appointments SET status = ?, updated_at = datetime('now') WHERE id = ?"
-    ).bind(status, appointmentId).run();
+    await c.env.DB.prepare("UPDATE appointments SET status = ?, updated_at = datetime('now') WHERE id = ?").bind(status, appointmentId).run();
 
-    return c.json({ 
-      success: true, 
-      message: "Status wizyty został zaktualizowany"
+    return c.json({
+      success: true,
+      message: "Status wizyty został zaktualizowany",
     });
   } catch (error) {
     console.error("Update appointment status error:", error);
     return c.json({ error: "Błąd serwera" }, 500);
   }
 });
+
 
 // Admin - Update appointment details
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
@@ -485,21 +557,19 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
     }
 
     // Check if new time slot is available (exclude current appointment)
-    const existingAppointment = await c.env.DB.prepare(
-      "SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled' AND id != ?"
-    ).bind(date, time, appointmentId).first();
+    const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled' AND id != ?").bind(date, time, appointmentId).first();
 
     if (existingAppointment) {
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
     }
 
-    await c.env.DB.prepare(
-      "UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?"
-    ).bind(date, time, description || "", status || "pending", appointmentId).run();
+    await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
+      .bind(date, time, description || "", status || "pending", appointmentId)
+      .run();
 
-    return c.json({ 
-      success: true, 
-      message: "Wizyta została zaktualizowana"
+    return c.json({
+      success: true,
+      message: "Wizyta została zaktualizowana",
     });
   } catch (error) {
     console.error("Update appointment error:", error);
@@ -512,13 +582,11 @@ app.delete("/api/admin/appointments/:id", adminMiddleware, async (c) => {
   try {
     const appointmentId = c.req.param("id");
 
-    await c.env.DB.prepare(
-      "DELETE FROM appointments WHERE id = ?"
-    ).bind(appointmentId).run();
+    await c.env.DB.prepare("DELETE FROM appointments WHERE id = ?").bind(appointmentId).run();
 
-    return c.json({ 
-      success: true, 
-      message: "Wizyta została usunięta"
+    return c.json({
+      success: true,
+      message: "Wizyta została usunięta",
     });
   } catch (error) {
     console.error("Delete appointment error:", error);
