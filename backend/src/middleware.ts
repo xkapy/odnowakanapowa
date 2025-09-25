@@ -5,12 +5,7 @@ export const corsMiddleware = () => {
   return async (c: any, next: any) => {
     const origin = c.req.header("Origin");
 
-    const allowedOrigins = new Set([
-      "http://localhost:5173",
-      "https://odnowakanapowa.pl",
-      "https://www.odnowakanapowa.pl",
-      "https://odnowakanapowa-frontend-git.pages.dev",
-    ]);
+    const allowedOrigins = new Set(["http://localhost:5173", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl", "https://odnowakanapowa-frontend-git.pages.dev"]);
 
     const isPagesDev = typeof origin === "string" && origin.endsWith(".pages.dev");
 
@@ -35,7 +30,7 @@ export const corsMiddleware = () => {
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
           "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
           "Access-Control-Allow-Credentials": "true",
-          "Vary": "Origin",
+          Vary: "Origin",
         };
         return new Response(null, { status: 204, headers });
       }

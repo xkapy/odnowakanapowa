@@ -45,12 +45,16 @@ export default function registerAppointmentsRoutes(app: Hono<any>, authMiddlewar
       if (!date || !time) return c.json({ error: "Data i godzina są wymagane" }, 400);
       const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'").bind(date, time).first();
       if (existingAppointment) return c.json({ error: "Ten termin jest już zajęty" }, 400);
-      const result = await c.env.DB.prepare("INSERT INTO appointments (user_id, date, time, description, status, created_at) VALUES (?, ?, ?, ?, 'pending', datetime('now'))").bind(userPayload.userId, date, time, comment || "").run();
+      const result = await c.env.DB.prepare("INSERT INTO appointments (user_id, date, time, description, status, created_at) VALUES (?, ?, ?, ?, 'pending', datetime('now'))")
+        .bind(userPayload.userId, date, time, comment || "")
+        .run();
       const appointmentId = result.meta.last_row_id;
       if (services && Array.isArray(services) && services.length > 0) {
         for (const service of services) {
           try {
-            await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)").bind(appointmentId, service.id, service.quantity || 1).run();
+            await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+              .bind(appointmentId, service.id, service.quantity || 1)
+              .run();
           } catch (error) {
             console.log("Could not save appointment service:", error);
           }
@@ -78,12 +82,18 @@ export default function registerAppointmentsRoutes(app: Hono<any>, authMiddlewar
       if (!date || !time || !guestName || !guestEmail || !guestPhone) return c.json({ error: "Wszystkie pola są wymagane" }, 400);
       const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled'").bind(date, time).first();
       if (existingAppointment) return c.json({ error: "Ten termin jest już zajęty" }, 400);
-      const result = await c.env.DB.prepare("INSERT INTO appointments (guest_name, guest_email, guest_phone, date, time, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'))").bind(guestName, guestEmail, guestPhone, date, time, comment || "").run();
+      const result = await c.env.DB.prepare(
+        "INSERT INTO appointments (guest_name, guest_email, guest_phone, date, time, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'))"
+      )
+        .bind(guestName, guestEmail, guestPhone, date, time, comment || "")
+        .run();
       const appointmentId = result.meta.last_row_id;
       if (services && Array.isArray(services) && services.length > 0) {
         for (const service of services) {
           try {
-            await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)").bind(appointmentId, service.id, service.quantity || 1).run();
+            await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+              .bind(appointmentId, service.id, service.quantity || 1)
+              .run();
           } catch (error) {
             console.log("Could not save appointment service:", error);
           }
