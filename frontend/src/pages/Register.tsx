@@ -44,12 +44,23 @@ const Register = () => {
         body: JSON.stringify(registerData),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        // If backend returned non-JSON (or empty), use the raw text as error message
+        data = { error: text || "Nieoczekiwana odpowiedź serwera" };
+      }
 
       if (response.ok) {
-        // Store token in localStorage (later we'll use proper auth context)
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        // If server returned a token, store it
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
 
         // Notify other components about auth change
         window.dispatchEvent(new Event("authChange"));
