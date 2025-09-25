@@ -628,9 +628,13 @@ app.get("/api/test/appointment/:id/services", async (c) => {
 // Admin - Update appointment details
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
   try {
+    console.log("🚀 PUT request received for appointment ID:", c.req.param("id"));
+    
     const appointmentId = c.req.param("id");
-    const { date, time, description, status, services } = await c.req.json();
+    const requestBody = await c.req.json();
+    const { date, time, description, status, services } = requestBody;
 
+    console.log("📝 Full request body:", requestBody);
     console.log("🔄 Updating appointment:", appointmentId, "with data:", { date, time, services });
     console.log("🔄 Services array length:", services?.length || 0);
 
