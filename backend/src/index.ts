@@ -405,6 +405,23 @@ app.get("/api/appointments/available-times/:date", async (c) => {
   }
 });
 
+// Get occupied dates for calendar
+app.get("/api/appointments/occupied-dates", async (c) => {
+  try {
+    const endDate = c.req.query("endDate") || "2025-12-31";
+
+    // Get all dates that have appointments (not cancelled)
+    const appointments = await c.env.DB.prepare("SELECT DISTINCT date FROM appointments WHERE date <= ? AND status != 'cancelled' ORDER BY date").bind(endDate).all();
+
+    const occupiedDates = (appointments.results || []).map((apt: any) => apt.date);
+
+    return c.json({ occupiedDates });
+  } catch (error) {
+    console.error("Occupied dates error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
 // Create appointment
 app.post("/api/appointments", authMiddleware, async (c: any) => {
   try {
