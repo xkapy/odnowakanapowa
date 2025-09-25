@@ -402,7 +402,7 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
     const { date, time, services, serviceIds, comment } = await c.req.json();
 
     // Debug logging
-    console.log("Received appointment data:", { date, time, services, serviceIds, comment });
+    console.log("[USER] Received appointment data:", { date, time, services, serviceIds, comment });
 
     if (!date || !time) {
       return c.json({ error: "Data i godzina są wymagane" }, 400);
@@ -424,25 +424,31 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
 
     // Save services if provided (new format with quantity)
     if (services && Array.isArray(services) && services.length > 0) {
+      console.log(`[USER] Saving ${services.length} services for appointment ${appointmentId}:`, services);
       for (const service of services) {
         try {
+          console.log(`[USER] Saving service: id=${service.id}, quantity=${service.quantity || 1}`);
           await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
             .bind(appointmentId, service.id, service.quantity || 1)
             .run();
+          console.log(`[USER] Successfully saved service ${service.id}`);
         } catch (error) {
-          console.log("Could not save appointment service:", error);
+          console.log("[USER] Could not save appointment service:", error);
         }
       }
     }
     // Backward compatibility with old serviceIds format
     else if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
+      console.log(`[USER] Saving ${serviceIds.length} serviceIds for appointment ${appointmentId}:`, serviceIds);
       for (const serviceId of serviceIds) {
         try {
           await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)").bind(appointmentId, serviceId, 1).run();
         } catch (error) {
-          console.log("Could not save appointment service:", error);
+          console.log("[USER] Could not save appointment service:", error);
         }
       }
+    } else {
+      console.log(`[USER] No services provided for appointment ${appointmentId}`);
     }
 
     return c.json({
