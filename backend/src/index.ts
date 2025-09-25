@@ -659,6 +659,54 @@ app.put("/api/user/password", authMiddleware, async (c: any) => {
   }
 });
 
+// Compatibility endpoint: frontend expects /api/user/change-password
+app.put("/api/user/change-password", authMiddleware, async (c: any) => {
+  try {
+    const userPayload = c.get("user");
+    const userId = userPayload.userId;
+    const { currentPassword, newPassword } = await c.req.json();
+
+    if (!currentPassword || !newPassword) {
+      return c.json({ error: "Obecne i nowe hasło są wymagane" }, 400);
+    }
+
+    const user = await c.env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(userId).first();
+    if (!user) {
+      return c.json({ error: "Użytkownik nie znaleziony" }, 404);
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return c.json({ error: "Obecne hasło jest nieprawidłowe" }, 400);
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await c.env.DB.prepare("UPDATE users SET password = ? WHERE id = ?").bind(hashed, userId).run();
+
+    return c.json({ success: true, message: "Hasło zostało zmienione" });
+  } catch (error) {
+    console.error("Change password (compat) error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
+// Compatibility endpoint: frontend expects /api/user/delete-profile
+app.delete("/api/user/delete-profile", authMiddleware, async (c: any) => {
+  try {
+    const userPayload = c.get("user");
+    const userId = userPayload.userId;
+
+    await c.env.DB.prepare(`DELETE FROM appointment_services WHERE appointment_id IN (SELECT id FROM appointments WHERE user_id = ?)`).bind(userId).run();
+    await c.env.DB.prepare("DELETE FROM appointments WHERE user_id = ?").bind(userId).run();
+    await c.env.DB.prepare("DELETE FROM users WHERE id = ?").bind(userId).run();
+
+    return c.json({ success: true, message: "Konto zostało usunięte" });
+  } catch (error) {
+    console.error("Delete user (compat) error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
 // Admin - Update appointment status
 app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
   try {

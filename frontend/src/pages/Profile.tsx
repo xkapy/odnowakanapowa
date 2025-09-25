@@ -208,7 +208,7 @@ const Profile = () => {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/user/change-password`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -267,7 +267,7 @@ const Profile = () => {
 
     try {
       console.log("Making DELETE request to backend...");
-      const response = await fetch(`${API_BASE_URL}/api/user/delete-profile`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
