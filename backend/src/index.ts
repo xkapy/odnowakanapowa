@@ -617,22 +617,24 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
     const requestBody = await c.req.json();
     const { date, time, description, status, services } = requestBody;
 
-    console.log("📝 Full request body:", requestBody);
-    console.log("🔄 Updating appointment:", appointmentId, "with data:", { date, time, services });
-    console.log("🔄 Services array length:", services?.length || 0);
+    console.log("📝 Full request body:", JSON.stringify(requestBody));
+    console.log("🔄 Parsed values:", { date, time, description, status, services });
 
     if (!date || !time) {
+      console.log("❌ Missing date or time");
       return c.json({ error: "Data i godzina są wymagane" }, 400);
     }
 
+    console.log("⏰ Checking time slot availability...");
     // Check if new time slot is available (exclude current appointment)
     const existingAppointment = await c.env.DB.prepare("SELECT id FROM appointments WHERE date = ? AND time = ? AND status != 'cancelled' AND id != ?").bind(date, time, appointmentId).first();
 
     if (existingAppointment) {
+      console.log("❌ Time slot already taken:", existingAppointment);
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
     }
 
-    console.log("🔄 About to update basic appointment info...");
+    console.log("✅ Time slot is available, proceeding with update...");
     // Update appointment basic info
     const updateResult = await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(date, time, description || "", status || "pending", appointmentId)
@@ -642,7 +644,7 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
 
     // Update appointment services if provided
     if (services && Array.isArray(services)) {
-      console.log("🔄 About to update services for appointment:", appointmentId, services);
+      console.log("🔄 About to update services for appointment:", appointmentId, "Services:", JSON.stringify(services));
 
       // Delete existing services
       console.log("🗑️ Deleting existing services...");
@@ -651,7 +653,10 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
 
       // Insert new services
       console.log("➕ Inserting new services...");
-      for (const service of services) {
+      for (let i = 0; i < services.length; i++) {
+        const service = services[i];
+        console.log(`➕ Processing service ${i + 1}/${services.length}:`, JSON.stringify(service));
+        
         if (service.id && service.quantity && service.quantity > 0) {
           console.log(`➕ About to insert service: ${service.id}, quantity: ${service.quantity}`);
           const insertResult = await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
@@ -659,9 +664,11 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
             .run();
           console.log("✅ Insert result:", insertResult);
         } else {
-          console.log("⏭️ Skipping service (invalid data):", service);
+          console.log("⏭️ Skipping service (invalid data):", JSON.stringify(service));
         }
       }
+    } else {
+      console.log("🔄 No services provided or services is not array");
     }
 
     console.log("🎉 Update completed successfully");
@@ -671,6 +678,7 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
     });
   } catch (error) {
     console.error("❌ Update appointment error:", error);
+    console.error("❌ Error stack:", error instanceof Error ? error.stack : "No stack");
     return c.json({ error: "Błąd serwera: " + (error instanceof Error ? error.message : String(error)) }, 500);
   }
 });
