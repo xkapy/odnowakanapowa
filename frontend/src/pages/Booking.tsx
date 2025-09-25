@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Calendar from "../components/Calendar";
 import { API_BASE_URL } from "../config/api";
 import { parseResponse } from "../utils/parseResponse";
+import { safeParseJSON } from "../utils/safeParseJSON";
 // Removed local data imports - now using API data with categorization
 
 interface SelectedService {
@@ -45,9 +46,6 @@ const Booking = () => {
   };
 
   // Get user and token from localStorage safely
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { safeParseJSON } = require("../utils/safeParseJSON");
   const user = safeParseJSON(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
 

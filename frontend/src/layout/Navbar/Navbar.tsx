@@ -4,6 +4,7 @@ import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
 import logoIcon from "../../assets/images/logo-icon.svg";
 import logoText from "../../assets/images/logo-text.svg";
 import { Link } from "react-router-dom";
+import { safeParseJSON } from "../../utils/safeParseJSON";
 
 const navigation = [
   { id: "home", name: "Home", to: "/" },
@@ -24,10 +25,6 @@ const Navbar = () => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("token");
       const userData = localStorage.getItem("user");
-      // Use safe parse to avoid exceptions if stored string is invalid
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { safeParseJSON } = require("../../utils/safeParseJSON");
       const parsedUser = safeParseJSON(userData);
 
       if (token && parsedUser) {
