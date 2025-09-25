@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy src/index.ts",
+    "deploy:prod": "wrangler deploy src/index.ts --env production",
     "build": "tsc"
   },
   "keywords": [
