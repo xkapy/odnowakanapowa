@@ -95,8 +95,9 @@ temp/
 Thumbs.db
 
 # Cloudflare
+# Wrangler
 .wrangler/
-wrangler.toml
+# wrangler.toml - commented out because it's needed for auto-deployment
 
 # Deployment
 .vercel
