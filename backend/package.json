@@ -1,23 +1,35 @@
 {
-  "name": "odnowakanapowa-backend",
+  "name": "odnowa-kanapowa-api",
   "version": "1.0.0",
-  "description": "Backend for Odnowa Kanapowa application",
-  "main": "src/worker.ts",
+  "description": "Modern API for Odnowa Kanapowa cleaning services",
+  "main": "src/index.ts",
+  "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/worker.ts",
-    "start": "bun run src/worker.ts",
-    "build": "bun build src/worker.ts --outdir ./dist",
-    "deploy": "npx wrangler deploy --config wrangler.toml"
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy",
+    "build": "tsc"
   },
+  "keywords": [
+    "cleaning",
+    "api",
+    "cloudflare",
+    "hono"
+  ],
+  "author": "Kacper Gembalczyk",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
   "dependencies": {
-    "hono": "^4.6.3",
-    "zod": "^3.23.8",
-    "@hono/zod-validator": "^0.2.2"
+    "@hono/zod-validator": "^0.7.3",
+    "bcryptjs": "^3.0.2",
+    "hono": "^4.9.8",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250924.0",
-    "wrangler": "^4.39.0"
-  },
-  "type": "module",
-  "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
+    "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.40.0"
+  }
 }
