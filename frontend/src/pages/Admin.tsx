@@ -444,12 +444,16 @@ export default function Admin() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-sm text-gray-900">
-                            {appointment.services.map((service, index) => (
-                              <div key={index} className="mb-1">
-                                {service.quantity > 1 ? `${service.quantity}x ` : ""}
-                                {service.name} - {service.price}
-                              </div>
-                            ))}
+                            {appointment.services && appointment.services.length > 0 ? (
+                              appointment.services.map((service, index) => (
+                                <div key={index} className="mb-1">
+                                  {service.quantity > 1 ? `${service.quantity}x ` : ""}
+                                  {service.name} - {service.price}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-gray-500">Brak usług</div>
+                            )}
                           </div>
                           {appointment.description && (
                             <div className="text-sm text-gray-500 mt-2">
