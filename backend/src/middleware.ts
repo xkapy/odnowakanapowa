@@ -14,15 +14,34 @@ export const corsMiddleware = () => {
 
     const isPagesDev = typeof origin === "string" && origin.endsWith(".pages.dev");
 
-    if (origin && (allowedOrigins.has(origin) || isPagesDev)) {
+    // Compute whether this origin is allowed
+    const allowed = typeof origin === "string" && (allowedOrigins.has(origin) || isPagesDev);
+
+    // Prepare headers to attach when origin is allowed
+    if (allowed && origin) {
+      // Always set the headers on the context so downstream handlers include them
       c.header("Access-Control-Allow-Origin", origin);
       c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
       c.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
       c.header("Access-Control-Allow-Credentials", "true");
+      c.header("Vary", "Origin");
     }
 
+    // If this is a preflight request, respond immediately with the CORS headers.
     if (c.req.method === "OPTIONS") {
-      return c.body(null, 204);
+      if (allowed && origin) {
+        const headers: Record<string, string> = {
+          "Access-Control-Allow-Origin": origin,
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+          "Access-Control-Allow-Credentials": "true",
+          "Vary": "Origin",
+        };
+        return new Response(null, { status: 204, headers });
+      }
+
+      // If origin not allowed, still respond to OPTIONS with no CORS headers (browser will block)
+      return new Response(null, { status: 204 });
     }
 
     await next();
