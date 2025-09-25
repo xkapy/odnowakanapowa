@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy src/index.ts",
     "build": "tsc"
   },
   "keywords": [
