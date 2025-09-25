@@ -401,6 +401,9 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
     const userPayload = c.get("user");
     const { date, time, services, serviceIds, comment } = await c.req.json();
 
+    // Debug logging
+    console.log("Received appointment data:", { date, time, services, serviceIds, comment });
+
     if (!date || !time) {
       return c.json({ error: "Data i godzina są wymagane" }, 400);
     }
@@ -457,6 +460,9 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
 app.post("/api/appointments/guest", async (c) => {
   try {
     const { date, time, services, serviceIds, comment, guestName, guestEmail, guestPhone } = await c.req.json();
+
+    // Debug logging
+    console.log("Received guest appointment data:", { date, time, services, serviceIds, comment, guestName, guestEmail, guestPhone });
 
     if (!date || !time || !guestName || !guestEmail || !guestPhone) {
       return c.json({ error: "Wszystkie pola są wymagane" }, 400);
@@ -576,6 +582,24 @@ app.get("/api/test/appointment/:id/services", async (c) => {
     return c.json({
       appointmentId: appointmentId,
       services: services[appointmentIdNum] || [],
+      allData: services,
+    });
+  } catch (error) {
+    console.error("Test appointment services error:", error);
+    return c.json({ error: "Błąd serwera" }, 500);
+  }
+});
+
+// Test endpoint to check appointment services
+app.get("/api/test/appointment/:id/services", async (c) => {
+  try {
+    const appointmentId = c.req.param("id");
+    const appointmentIdNum = parseInt(appointmentId);
+    const services = await getAppointmentServices(c.env.DB, [appointmentIdNum]);
+    return c.json({
+      appointmentId: appointmentId,
+      services: services[appointmentIdNum] || [],
+      serviceCount: (services[appointmentIdNum] || []).length,
       allData: services,
     });
   } catch (error) {

@@ -159,6 +159,9 @@ const Booking = () => {
       return;
     }
 
+    // Debug logging
+    console.log("Selected services before sending:", selectedServices);
+
     const appointmentData = isGuest
       ? {
           date: selectedDate,
@@ -175,6 +178,9 @@ const Booking = () => {
           services: selectedServices.map((s) => ({ id: s.id, quantity: s.quantity })),
           comment: comment.trim() || null,
         };
+
+    // Debug logging
+    console.log("Appointment data being sent:", appointmentData);
 
     try {
       const endpoint = isGuest ? `${API_BASE_URL}/api/appointments/guest` : `${API_BASE_URL}/api/appointments`;
