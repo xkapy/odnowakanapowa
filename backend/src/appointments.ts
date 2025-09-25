@@ -12,6 +12,17 @@ export default function registerAppointmentsRoutes(app: Hono<any>, authMiddlewar
     }
   });
 
+  // Backwards-compatible route for frontend: GET /api/services
+  app.get("/api/services", async (c) => {
+    try {
+      const services = await (c.env as any).DB.prepare("SELECT id, name, price, description FROM services ORDER BY id").all();
+      return c.json(services.results || []);
+    } catch (error) {
+      console.error("Get /api/services error:", error);
+      return c.json({ error: "Błąd serwera" }, 500);
+    }
+  });
+
   app.get("/api/appointments/available-times/:date", async (c) => {
     try {
       const date = c.req.param("date");
