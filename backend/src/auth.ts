@@ -34,25 +34,88 @@ export default function registerAuthRoutes(app: Hono<any>) {
       const newUser = (await (c.env as any).DB.prepare("SELECT * FROM users WHERE id = ?").bind(result.meta.last_row_id).first()) as User;
       if (!newUser) return c.json({ error: "Błąd pobierania użytkownika" }, 500);
 
-      const token = jwt.sign({ userId: newUser.id, email: newUser.email, isAdmin: newUser.is_admin }, (c.env as any).JWT_SECRET, { expiresIn: "7d" });
+      // Ensure email_confirmations table exists
+      try {
+        await (c.env as any).DB.prepare(`
+          CREATE TABLE IF NOT EXISTS email_confirmations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            token TEXT,
+            expires_at TEXT,
+            confirmed INTEGER DEFAULT 0
+          )
+        `).run();
+      } catch (e) {
+        console.warn("Could not create email_confirmations table:", e);
+      }
 
-      return c.json({
-        success: true,
-        message: "Konto utworzone pomyślnie",
-        token,
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.first_name,
-          lastName: newUser.last_name,
-          phone: newUser.phone,
-          isAdmin: newUser.is_admin,
-          role: newUser.is_admin ? "admin" : "user",
-        },
-      });
+      // Generate confirmation token (JWT) valid for 24h
+      const confirmationToken = jwt.sign({ userId: newUser.id, email: newUser.email, type: "email_confirm" }, (c.env as any).JWT_SECRET, { expiresIn: "1d" });
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+      // Store token
+      await (c.env as any).DB.prepare(`INSERT INTO email_confirmations (user_id, token, expires_at, confirmed) VALUES (?, ?, ?, 0)`).bind(newUser.id, confirmationToken, expiresAt).run();
+
+      // Build confirmation URL
+      const frontendBase = (c.env as any).FRONTEND_URL || process.env.FRONTEND_URL || "";
+      const apiBase = (c.env as any).API_BASE_URL || process.env.API_BASE_URL || "";
+      const confirmUrl = apiBase ? `${apiBase.replace(/\/$/, "")}/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}` : `/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}`;
+
+      // Send email via SendGrid if configured, otherwise log confirmation URL
+      const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+      if (sendgridKey) {
+        try {
+          await fetch("https://api.sendgrid.com/v3/mail/send", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${sendgridKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              personalizations: [{ to: [{ email }], subject: "Potwierdź swój adres e-mail" }],
+              from: { email: "no-reply@odnowakanapowa.pl", name: "Odnowa Kanapowa" },
+              content: [{ type: "text/plain", value: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}` }],
+            }),
+          });
+        } catch (e) {
+          console.warn("SendGrid send error:", e);
+          console.log("Confirmation URL:", confirmUrl);
+        }
+      } else {
+        console.log("Confirmation URL:", confirmUrl);
+      }
+
+      return c.json({ success: true, message: "Konto utworzone. Sprawdź e-mail, aby potwierdzić konto." });
     } catch (error) {
       console.error("Register error:", error);
       return c.json({ error: "Błąd serwera" }, 500);
+    }
+  });
+
+  // Email confirmation endpoint
+  app.get("/api/auth/confirm", async (c) => {
+    try {
+      const token = c.req.query("token");
+      if (!token || typeof token !== "string") return c.text("Brak tokenu", 400);
+
+      // Verify JWT
+      try {
+        jwt.verify(token, (c.env as any).JWT_SECRET);
+      } catch (e) {
+        return c.text("Nieprawidłowy lub przeterminowany token", 400);
+      }
+
+      // Find confirmation record
+      const rec = await (c.env as any).DB.prepare("SELECT * FROM email_confirmations WHERE token = ?").bind(token).first();
+      if (!rec) return c.text("Token nie znaleziony", 404);
+
+      // Mark confirmed
+      await (c.env as any).DB.prepare("UPDATE email_confirmations SET confirmed = 1 WHERE id = ?").bind(rec.id).run();
+
+      return c.text("E-mail potwierdzony. Możesz teraz się zalogować.");
+    } catch (e) {
+      console.error("Confirm error:", e);
+      return c.text("Błąd serwera", 500);
     }
   });
 
@@ -63,6 +126,15 @@ export default function registerAuthRoutes(app: Hono<any>) {
 
       const user = (await (c.env as any).DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first()) as User;
       if (!user) return c.json({ error: "Nieprawidłowe dane logowania" }, 401);
+      // Check if email confirmed
+      try {
+        const rec = await (c.env as any).DB.prepare("SELECT confirmed FROM email_confirmations WHERE user_id = ? ORDER BY id DESC LIMIT 1").bind(user.id).first();
+        if (rec && rec.confirmed === 0) {
+          return c.json({ error: "Konto nie zostało potwierdzone. Sprawdź e-mail." }, 403);
+        }
+      } catch (e) {
+        // If table doesn't exist or any DB issue, allow login (backward compatible)
+      }
 
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) return c.json({ error: "Nieprawidłowe dane logowania" }, 401);
