@@ -63,13 +63,13 @@ export default function registerAuthRoutes(app: Hono<any>) {
 
       // Send email via SendGrid if configured, otherwise log confirmation URL
   const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+  const sendinblueKey = (c.env as any).SENDINBLUE_API_KEY || process.env.SENDINBLUE_API_KEY;
   const smtpHost = (c.env as any).SMTP_HOST || process.env.SMTP_HOST;
   const smtpUser = (c.env as any).SMTP_USER || process.env.SMTP_USER;
   const smtpPass = (c.env as any).SMTP_PASS || process.env.SMTP_PASS;
   const smtpPort = (c.env as any).SMTP_PORT || process.env.SMTP_PORT || 587;
 
-  // Try SendGrid API first (works on Workers). If not configured and we're running in Node
-  // with SMTP creds, fall back to nodemailer (useful when running backend on Node).
+  // Preferred order for Workers: SendGrid (API) -> Sendinblue (API) -> Node SMTP (nodemailer)
   if (sendgridKey) {
         try {
           const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
@@ -93,7 +93,102 @@ export default function registerAuthRoutes(app: Hono<any>) {
           }
         } catch (e) {
           console.warn("SendGrid send error:", e);
-          // attempt nodemailer fallback when possible
+          // If Sendinblue key exists, try that next (Workers-friendly HTTP API)
+          if (sendinblueKey) {
+            try {
+              const sibRes = await fetch("https://api.sendinblue.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "api-key": sendinblueKey,
+                },
+                body: JSON.stringify({
+                  sender: { name: "Odnowa Kanapowa", email: "no-reply@odnowakanapowa.pl" },
+                  to: [{ email }],
+                  subject: "Potwierdź swój adres e-mail",
+                  textContent: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+                }),
+              });
+              if (!sibRes.ok) {
+                const text = await sibRes.text().catch(() => "");
+                console.warn("Sendinblue returned non-OK status:", sibRes.status, text);
+                console.log("Confirmation URL:", confirmUrl);
+              }
+            } catch (e2) {
+              console.warn("Sendinblue send error:", e2);
+              // attempt nodemailer fallback when possible
+              if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-var-requires
+                  const nodemailer = require("nodemailer");
+                  const transporter = nodemailer.createTransport({
+                    host: smtpHost,
+                    port: Number(smtpPort),
+                    secure: Number(smtpPort) === 465,
+                    auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+                  });
+                  await transporter.sendMail({
+                    from: `Odnowa Kanapowa <${smtpUser || "no-reply@odnowakanapowa.pl"}>`,
+                    to: email,
+                    subject: "Potwierdź swój adres e-mail",
+                    text: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+                  });
+                } catch (err) {
+                  console.warn("Nodemailer fallback failed:", err);
+                  console.log("Confirmation URL:", confirmUrl);
+                }
+              } else {
+                console.log("Confirmation URL:", confirmUrl);
+              }
+            }
+          } else if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+            // No Sendinblue but SMTP configured and we are in Node: use nodemailer
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const nodemailer = require("nodemailer");
+              const transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: Number(smtpPort),
+                secure: Number(smtpPort) === 465,
+                auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+              });
+              await transporter.sendMail({
+                from: `Odnowa Kanapowa <${smtpUser || "no-reply@odnowakanapowa.pl"}>`,
+                to: email,
+                subject: "Potwierdź swój adres e-mail",
+                text: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+              });
+            } catch (err) {
+              console.warn("Nodemailer send error:", err);
+              console.log("Confirmation URL:", confirmUrl);
+            }
+          } else {
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        }
+      } else if (sendinblueKey) {
+        // No SendGrid, try Sendinblue directly
+        try {
+          const sibRes = await fetch("https://api.sendinblue.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "api-key": sendinblueKey,
+            },
+            body: JSON.stringify({
+              sender: { name: "Odnowa Kanapowa", email: "no-reply@odnowakanapowa.pl" },
+              to: [{ email }],
+              subject: "Potwierdź swój adres e-mail",
+              textContent: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+            }),
+          });
+          if (!sibRes.ok) {
+            const text = await sibRes.text().catch(() => "");
+            console.warn("Sendinblue returned non-OK status:", sibRes.status, text);
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        } catch (e) {
+          console.warn("Sendinblue send error:", e);
           if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
             try {
               // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -101,7 +196,7 @@ export default function registerAuthRoutes(app: Hono<any>) {
               const transporter = nodemailer.createTransport({
                 host: smtpHost,
                 port: Number(smtpPort),
-                secure: Number(smtpPort) === 465, // true for 465, false for other ports
+                secure: Number(smtpPort) === 465,
                 auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
               });
               await transporter.sendMail({
@@ -119,7 +214,7 @@ export default function registerAuthRoutes(app: Hono<any>) {
           }
         }
       } else if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
-        // No SendGrid but SMTP configured and we are in Node: use nodemailer
+        // No SendGrid/Sendinblue but SMTP configured and we are in Node: use nodemailer
         try {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const nodemailer = require("nodemailer");
@@ -235,6 +330,7 @@ export default function registerAuthRoutes(app: Hono<any>) {
       const confirmUrl = apiBase ? `${apiBase.replace(/\/$/, "")}/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}` : `/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}`;
 
   const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+  const sendinblueKey2 = (c.env as any).SENDINBLUE_API_KEY || process.env.SENDINBLUE_API_KEY;
   const smtpHost2 = (c.env as any).SMTP_HOST || process.env.SMTP_HOST;
   const smtpUser2 = (c.env as any).SMTP_USER || process.env.SMTP_USER;
   const smtpPass2 = (c.env as any).SMTP_PASS || process.env.SMTP_PASS;
@@ -262,6 +358,98 @@ export default function registerAuthRoutes(app: Hono<any>) {
           }
         } catch (e) {
           console.warn("SendGrid resend error:", e);
+          if (sendinblueKey2) {
+            try {
+              const sibRes = await fetch("https://api.sendinblue.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "api-key": sendinblueKey2,
+                },
+                body: JSON.stringify({
+                  sender: { name: "Odnowa Kanapowa", email: "no-reply@odnowakanapowa.pl" },
+                  to: [{ email }],
+                  subject: "Potwierdź swój adres e-mail",
+                  textContent: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+                }),
+              });
+              if (!sibRes.ok) {
+                const text = await sibRes.text().catch(() => "");
+                console.warn("Sendinblue returned non-OK status:", sibRes.status, text);
+                console.log("Confirmation URL:", confirmUrl);
+              }
+            } catch (e2) {
+              console.warn("Sendinblue resend error:", e2);
+              if (smtpHost2 && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-var-requires
+                  const nodemailer = require("nodemailer");
+                  const transporter = nodemailer.createTransport({
+                    host: smtpHost2,
+                    port: Number(smtpPort2),
+                    secure: Number(smtpPort2) === 465,
+                    auth: smtpUser2 && smtpPass2 ? { user: smtpUser2, pass: smtpPass2 } : undefined,
+                  });
+                  await transporter.sendMail({
+                    from: `Odnowa Kanapowa <${smtpUser2 || "no-reply@odnowakanapowa.pl"}>`,
+                    to: email,
+                    subject: "Potwierdź swój adres e-mail",
+                    text: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+                  });
+                } catch (err) {
+                  console.warn("Nodemailer resend fallback failed:", err);
+                  console.log("Confirmation URL:", confirmUrl);
+                }
+              } else {
+                console.log("Confirmation URL:", confirmUrl);
+              }
+            }
+          } else if (smtpHost2 && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const nodemailer = require("nodemailer");
+              const transporter = nodemailer.createTransport({
+                host: smtpHost2,
+                port: Number(smtpPort2),
+                secure: Number(smtpPort2) === 465,
+                auth: smtpUser2 && smtpPass2 ? { user: smtpUser2, pass: smtpPass2 } : undefined,
+              });
+              await transporter.sendMail({
+                from: `Odnowa Kanapowa <${smtpUser2 || "no-reply@odnowakanapowa.pl"}>`,
+                to: email,
+                subject: "Potwierdź swój adres e-mail",
+                text: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+              });
+            } catch (err) {
+              console.warn("Nodemailer resend send error:", err);
+              console.log("Confirmation URL:", confirmUrl);
+            }
+          } else {
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        }
+      } else if (sendinblueKey2) {
+        try {
+          const sibRes = await fetch("https://api.sendinblue.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "api-key": sendinblueKey2,
+            },
+            body: JSON.stringify({
+              sender: { name: "Odnowa Kanapowa", email: "no-reply@odnowakanapowa.pl" },
+              to: [{ email }],
+              subject: "Potwierdź swój adres e-mail",
+              textContent: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+            }),
+          });
+          if (!sibRes.ok) {
+            const text = await sibRes.text().catch(() => "");
+            console.warn("Sendinblue returned non-OK status:", sibRes.status, text);
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        } catch (e) {
+          console.warn("Sendinblue resend error:", e);
           if (smtpHost2 && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
             try {
               // eslint-disable-next-line @typescript-eslint/no-var-requires
