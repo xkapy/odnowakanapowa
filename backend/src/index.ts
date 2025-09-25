@@ -76,7 +76,7 @@ app.post("/api/auth/register", async (c) => {
     }
 
     // Get created user
-    const newUser = await c.env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(result.meta.last_row_id).first() as User;
+    const newUser = (await c.env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(result.meta.last_row_id).first()) as User;
 
     if (!newUser) {
       return c.json({ error: "Błąd pobierania użytkownika" }, 500);
@@ -123,7 +123,7 @@ app.post("/api/auth/login", async (c) => {
     }
 
     // Get user
-    const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first() as User;
+    const user = (await c.env.DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first()) as User;
 
     if (!user) {
       return c.json({ error: "Nieprawidłowe dane logowania" }, 401);
@@ -190,7 +190,7 @@ app.get("/api/user/profile", authMiddleware, async (c: any) => {
   try {
     const userPayload = c.get("user");
 
-    const user = await c.env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(userPayload.userId).first() as User;
+    const user = (await c.env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(userPayload.userId).first()) as User;
 
     if (!user) {
       return c.json({ error: "Użytkownik nie znaleziony" }, 404);
@@ -218,7 +218,18 @@ app.get("/api/user/appointments", authMiddleware, async (c: any) => {
 
     const appointments = await c.env.DB.prepare("SELECT * FROM appointments WHERE user_id = ? ORDER BY date DESC, time DESC").bind(userPayload.userId).all();
 
-    return c.json(appointments.results || []);
+    // Format appointments to match frontend expectations
+    const formattedAppointments = (appointments.results || []).map((apt: any) => ({
+      id: apt.id,
+      date: apt.date,
+      time: apt.time,
+      status: apt.status,
+      description: apt.description,
+      createdAt: apt.created_at,
+      services: [], // Empty array to prevent frontend errors
+    }));
+
+    return c.json({ appointments: formattedAppointments });
   } catch (error) {
     console.error("User appointments error:", error);
     return c.json({ error: "Błąd serwera" }, 500);

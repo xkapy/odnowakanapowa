@@ -88,7 +88,8 @@ const Profile = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setAppointments(data.appointments);
+        // Ensure we have a valid appointments array
+        setAppointments(data.appointments || []);
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -601,37 +602,38 @@ const Profile = () => {
           <div className="px-6 py-4 border-t border-gray-200">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Historia wizyt</h2>
 
-            {appointments.length === 0 ? (
+            {appointments && appointments.length === 0 ? (
               <p className="text-gray-500">Nie masz jeszcze żadnych wizyt.</p>
             ) : (
               <div className="space-y-4">
-                {appointments.map((appointment) => (
-                  <div key={appointment.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <p className="font-medium text-gray-900">
-                            {appointment.date} o {appointment.time}
-                          </p>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>{getStatusText(appointment.status)}</span>
-                        </div>
-                        {appointment.services && appointment.services.length > 0 && (
-                          <div className="mt-2">
-                            <p className="text-sm font-medium text-gray-700">Usługi:</p>
-                            {appointment.services.map((service, index) => (
-                              <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-2 mt-1">
-                                {service.quantity > 1 ? `${service.quantity}x ` : ""}
-                                {service.name} - {service.price}
-                              </span>
-                            ))}
+                {appointments &&
+                  appointments.map((appointment) => (
+                    <div key={appointment.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <p className="font-medium text-gray-900">
+                              {appointment.date} o {appointment.time}
+                            </p>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>{getStatusText(appointment.status)}</span>
                           </div>
-                        )}
-                        {appointment.description && <p className="text-sm text-gray-600 mt-1">{appointment.description}</p>}
-                        <p className="text-xs text-gray-500 mt-2">Utworzona: {new Date(appointment.createdAt).toLocaleString("pl-PL")}</p>
+                          {appointment.services && Array.isArray(appointment.services) && appointment.services.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-sm font-medium text-gray-700">Usługi:</p>
+                              {appointment.services.map((service, index) => (
+                                <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-2 mt-1">
+                                  {service.quantity > 1 ? `${service.quantity}x ` : ""}
+                                  {service.name} - {service.price}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {appointment.description && <p className="text-sm text-gray-600 mt-1">{appointment.description}</p>}
+                          <p className="text-xs text-gray-500 mt-2">Utworzona: {new Date(appointment.createdAt).toLocaleString("pl-PL")}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
