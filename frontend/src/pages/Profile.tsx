@@ -68,11 +68,11 @@ const Profile = () => {
         },
       });
 
-      if (response.ok) {
-        const data = await parseResponse(response);
-        setUser(data.user);
+      const parsed = await parseResponse<any>(response);
+      if (parsed.ok && parsed.data) {
+        setUser(parsed.data.user);
       } else {
-        setError("Błąd pobierania danych użytkownika");
+        setError(parsed.error || "Błąd pobierania danych użytkownika");
       }
     } catch (err) {
       setError("Błąd połączenia z serwerem");
@@ -87,10 +87,9 @@ const Profile = () => {
         },
       });
 
-      if (response.ok) {
-        const data = await parseResponse(response);
-        // Ensure we have a valid appointments array
-        setAppointments(data.appointments || []);
+      const parsed = await parseResponse<any>(response);
+      if (parsed.ok && parsed.data) {
+        setAppointments(parsed.data.appointments || []);
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -164,7 +163,7 @@ const Profile = () => {
 
         setEditingField(null);
       } else {
-        const errorData = await parseResponse(response);
+        const errorData = await response.json();
         setError(errorData.error || "Błąd podczas aktualizacji");
       }
     } catch (err) {
@@ -231,7 +230,7 @@ const Profile = () => {
         setError("");
         alert("Hasło zostało pomyślnie zmienione!");
       } else {
-        const errorData = await parseResponse(response);
+        const errorData = await response.json();
         setError(errorData.error || "Błąd podczas zmiany hasła");
       }
     } catch (err) {
@@ -285,7 +284,7 @@ const Profile = () => {
         localStorage.removeItem("user");
         window.location.href = "/";
       } else {
-        const errorData = await parseResponse(response);
+        const errorData = await response.json();
         console.log("Error data:", errorData);
         setError(errorData.error || "Błąd podczas usuwania profilu");
       }

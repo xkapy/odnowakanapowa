@@ -4,7 +4,6 @@ import { Bars3Icon, XMarkIcon, UserIcon } from "@heroicons/react/24/outline";
 import logoIcon from "../../assets/images/logo-icon.svg";
 import logoText from "../../assets/images/logo-text.svg";
 import { Link } from "react-router-dom";
-import { safeParseJSON } from "../../utils/safeParseJSON";
 
 const navigation = [
   { id: "home", name: "Home", to: "/" },
@@ -25,11 +24,10 @@ const Navbar = () => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("token");
       const userData = localStorage.getItem("user");
-      const parsedUser = safeParseJSON(userData);
 
-      if (token && parsedUser) {
+      if (token && userData) {
         setIsLoggedIn(true);
-        setUser(parsedUser);
+        setUser(JSON.parse(userData));
       } else {
         setIsLoggedIn(false);
         setUser(null);

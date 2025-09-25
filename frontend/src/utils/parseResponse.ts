@@ -1,16 +1,20 @@
-// Safe response parser: handles empty bodies and non-JSON text without throwing
-export async function parseResponse(response: Response) {
-  try {
-    const text = await response.text().catch(() => "");
-    // Treat non-string or empty as empty body
-    if (typeof text !== "string" || text.length === 0) return {};
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      // Return raw text when it's not JSON
-      return { text };
-    }
-  } catch (e) {
-    return {};
-  }
+export async function parseResponse<T = any>(res: Response): Promise<{ ok: boolean; status: number; data?: T; error?: string }> {
+	const result: { ok: boolean; status: number; data?: T; error?: string } = { ok: res.ok, status: res.status };
+	const text = await res.text().catch(() => "");
+	if (!text) {
+		if (!res.ok) result.error = `HTTP ${res.status}`;
+		return result;
+	}
+
+	try {
+		const json = JSON.parse(text);
+		if (res.ok) result.data = json as T;
+		else result.error = (json && (json.error || json.message)) || JSON.stringify(json);
+	} catch (e) {
+		// not JSON
+		if (res.ok) result.data = (text as unknown as T);
+		else result.error = text;
+	}
+
+	return result;
 }

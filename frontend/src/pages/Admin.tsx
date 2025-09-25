@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
-import { parseResponse } from "../utils/parseResponse";
 import Calendar from "../components/Calendar";
 
 interface Appointment {
@@ -95,7 +94,7 @@ export default function Admin() {
       });
 
       if (response.ok) {
-        const data = await parseResponse(response);
+        const data = await response.json();
         console.log("Admin appointments response:", data);
         console.log("Is array?", Array.isArray(data));
 
@@ -132,7 +131,7 @@ export default function Admin() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/appointments/services`);
       if (response.ok) {
-        const data = await parseResponse(response);
+        const data = await response.json();
         setAvailableServices(data.services || []);
       }
     } catch (err) {
@@ -165,7 +164,7 @@ export default function Admin() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/appointments/available-times/${date}`);
       if (response.ok) {
-        const data = await parseResponse(response);
+        const data = await response.json();
         setAvailableTimeSlots(data.availableTimes || []);
       }
     } catch (err) {
@@ -233,7 +232,7 @@ export default function Admin() {
       console.log("📡 Response status:", response.status);
 
       if (response.ok) {
-        const result = await parseResponse(response);
+        const result = await response.json();
         console.log("✅ Success result:", result);
         setSuccess("Wizyta została zaktualizowana");
         fetchAppointments();
@@ -343,14 +342,14 @@ export default function Admin() {
       console.log("Delete response status:", response.status);
 
       if (response.ok) {
-        const result = await parseResponse(response);
+        const result = await response.json();
         console.log("Delete success:", result);
         // Remove the appointment from the local state
         setAppointments((prev) => prev.filter((appointment) => appointment.id !== appointmentId));
         setSuccess("Wizyta została usunięta");
         setTimeout(() => setSuccess(""), 3000);
       } else {
-        const errorData = await parseResponse(response);
+        const errorData = await response.text();
         console.log("Delete error response:", errorData);
         setError("Nie udało się usunąć wizyty");
       }

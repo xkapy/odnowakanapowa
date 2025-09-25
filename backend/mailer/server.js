@@ -1,47 +1,57 @@
+#!/usr/bin/env node
+/* Simple mailer microservice using Express and Nodemailer
+   - POST /send with JSON { to, subject, text, html? }
+   - Uses SMTP creds from env: ADMIN_EMAIL and ADMIN_EMAIL_APP_PASSWORD
+   - Starts on PORT (default 3001)
+*/
 import express from "express";
-import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_PORT = process.env.SMTP_PORT || 587;
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
+const PORT = process.env.PORT || 3001;
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPass = process.env.ADMIN_EMAIL_APP_PASSWORD;
+const mailerSecret = process.env.MAILER_SECRET; // expected secret from Worker
+const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+const smtpPort = Number(process.env.SMTP_PORT || 587);
 
-if (!SMTP_HOST) {
-  console.warn("[mailer] No SMTP_HOST configured — mailer will fail until env vars are set.");
+if (!adminEmail || !adminPass) {
+  console.error("ADMIN_EMAIL and ADMIN_EMAIL_APP_PASSWORD must be set in mailer environment");
 }
 
 const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: Number(SMTP_PORT),
-  secure: Number(SMTP_PORT) === 465,
-  auth: SMTP_USER && SMTP_PASS ? { user: SMTP_USER, pass: SMTP_PASS } : undefined,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpPort === 465,
+  auth: {
+    user: adminEmail,
+    pass: adminPass,
+  },
 });
 
 app.post("/send", async (req, res) => {
   try {
-    const { to, subject, text, html, from } = req.body;
-    if (!to || !subject || (!text && !html)) return res.status(400).json({ error: "to, subject and text/html are required" });
+    // If MAILER_SECRET is set, require the header
+    if (mailerSecret) {
+      const incoming = req.headers["authorization"] || req.headers["x-mailer-secret"];
+      const token = typeof incoming === "string" ? (incoming.startsWith("Bearer ") ? incoming.slice(7) : incoming) : undefined;
+      if (!token || token !== mailerSecret) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+    }
 
-    const mailOptions = {
-      from: from || (SMTP_USER ? SMTP_USER : 'no-reply@odnowakanapowa.pl'),
-      to,
-      subject,
-      text,
-      html,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("[mailer] sent", info);
+    const { to, subject, text, html } = req.body;
+    if (!to || !subject || (!text && !html)) return res.status(400).json({ error: "Missing fields (to, subject, text/html)" });
+    const info = await transporter.sendMail({ from: adminEmail, to, subject, text, html });
     return res.json({ success: true, info });
-  } catch (err) {
-    console.error("[mailer] send error:", err);
-    return res.status(500).json({ error: "Send error", details: err?.toString?.() });
+  } catch (e) {
+    console.error("Mailer error:", e);
+    return res.status(500).json({ error: "Mailer error" });
   }
 });
 
-const port = process.env.PORT || 3001;
-app.listen(port, () => console.log(`[mailer] listening on http://localhost:${port}`));
+app.get("/", (req, res) => res.send("Mailer running"));
+
+app.listen(PORT, () => console.log(`Mailer service listening on port ${PORT}`));

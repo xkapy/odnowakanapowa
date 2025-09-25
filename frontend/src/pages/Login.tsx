@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
-import { parseResponse } from "../utils/parseResponse";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -25,12 +24,12 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await parseResponse(response);
+      const data = await response.json();
 
       if (response.ok) {
         // Store token in localStorage (later we'll use proper auth context)
-          if (data.token) localStorage.setItem("token", data.token);
-          if (data.user && typeof data.user === "object") localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         // Notify other components about auth change
         window.dispatchEvent(new Event("authChange"));
@@ -38,7 +37,7 @@ const Login = () => {
         // Redirect to home or intended page
         window.location.href = "/";
       } else {
-        setError(data.error || data.message || "Błąd logowania");
+        setError(data.error || "Błąd logowania");
       }
     } catch (err) {
       setError("Błąd połączenia z serwerem");
