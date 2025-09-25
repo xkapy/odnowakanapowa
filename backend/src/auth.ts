@@ -92,7 +92,11 @@ export default function registerAuthRoutes(app: Hono<any>) {
         console.log("Confirmation URL:", confirmUrl);
       }
 
-      return c.json({ success: true, message: "Konto utworzone. Sprawdź e-mail, aby potwierdzić konto." });
+      // Optionally expose confirmation URL in response for debugging/testing
+      const debugExpose = (c.env as any).DEBUG_CONFIRM_RESPONSE === "true" || process.env.DEBUG_CONFIRM_RESPONSE === "true";
+      const registerPayload: any = { success: true, message: "Konto utworzone. Sprawdź e-mail, aby potwierdzić konto." };
+      if (debugExpose) registerPayload.confirmUrl = confirmUrl;
+      return c.json(registerPayload);
     } catch (error) {
       console.error("Register error:", error);
       return c.json({ error: "Błąd serwera" }, 500);
@@ -208,7 +212,10 @@ export default function registerAuthRoutes(app: Hono<any>) {
         console.log("Confirmation URL:", confirmUrl);
       }
 
-      return c.json({ success: true, message: "Token potwierdzający wysłany (jeśli SendGrid jest skonfigurowany)." });
+      const debugExposeResend = (c.env as any).DEBUG_CONFIRM_RESPONSE === "true" || process.env.DEBUG_CONFIRM_RESPONSE === "true";
+      const resendPayload: any = { success: true, message: "Token potwierdzający wysłany (jeśli SendGrid jest skonfigurowany)." };
+      if (debugExposeResend) resendPayload.confirmUrl = confirmUrl;
+      return c.json(resendPayload);
     } catch (e) {
       console.error("Resend error:", e);
       return c.json({ error: "Błąd serwera" }, 500);
