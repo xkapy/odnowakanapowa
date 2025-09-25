@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config/api";
+import { parseResponse } from "../utils/parseResponse";
 import { Link } from "react-router-dom";
 
 interface User {
@@ -68,7 +69,7 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await parseResponse(response);
         setUser(data.user);
       } else {
         setError("Błąd pobierania danych użytkownika");
@@ -87,7 +88,7 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await parseResponse(response);
         // Ensure we have a valid appointments array
         setAppointments(data.appointments || []);
       }
@@ -163,7 +164,7 @@ const Profile = () => {
 
         setEditingField(null);
       } else {
-        const errorData = await response.json();
+        const errorData = await parseResponse(response);
         setError(errorData.error || "Błąd podczas aktualizacji");
       }
     } catch (err) {
@@ -230,7 +231,7 @@ const Profile = () => {
         setError("");
         alert("Hasło zostało pomyślnie zmienione!");
       } else {
-        const errorData = await response.json();
+        const errorData = await parseResponse(response);
         setError(errorData.error || "Błąd podczas zmiany hasła");
       }
     } catch (err) {
@@ -284,7 +285,7 @@ const Profile = () => {
         localStorage.removeItem("user");
         window.location.href = "/";
       } else {
-        const errorData = await response.json();
+        const errorData = await parseResponse(response);
         console.log("Error data:", errorData);
         setError(errorData.error || "Błąd podczas usuwania profilu");
       }

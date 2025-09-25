@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Calendar from "../components/Calendar";
 import { API_BASE_URL } from "../config/api";
+import { parseResponse } from "../utils/parseResponse";
 // Removed local data imports - now using API data with categorization
 
 interface SelectedService {
@@ -52,7 +53,7 @@ const Booking = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/services`);
       if (response.ok) {
-        const services = await response.json();
+        const services = await parseResponse(response);
         console.log("✅ Loaded services from API:", services.length, "services");
         console.log("API Services IDs:", services.map((s: any) => `${s.id}: ${s.name}`).join(", "));
         setApiServices(services);
@@ -129,8 +130,8 @@ const Booking = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/appointments/available-times/${date}`);
       if (response.ok) {
-        const data = await response.json();
-        setAvailableSlots(data.availableTimes);
+        const data = await parseResponse(response);
+        setAvailableSlots(data.availableTimes || []);
         setSelectedTime(""); // Reset selected time when date changes
       }
     } catch (err) {
@@ -146,7 +147,7 @@ const Booking = () => {
 
       const response = await fetch(`${API_BASE_URL}/api/appointments/occupied-dates?endDate=${endDate.toISOString().split("T")[0]}`);
       if (response.ok) {
-        const data = await response.json();
+        const data = await parseResponse(response);
         setOccupiedDates(data.occupiedDates || []);
       }
     } catch (err) {
@@ -268,8 +269,8 @@ const Booking = () => {
           setGuestData({ firstName: "", lastName: "", email: "", phone: "" });
         }
       } else {
-        const errorData = await response.json();
-        setMessage(errorData.message || "Błąd podczas umawiania wizyty");
+        const errorData = await parseResponse(response);
+        setMessage(errorData.message || errorData.error || "Błąd podczas umawiania wizyty");
       }
     } catch (err) {
       console.error("Error submitting appointment:", err);

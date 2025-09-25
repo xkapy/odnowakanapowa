@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LuMailOpen, LuMessagesSquare, LuCopy, LuPhone } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
+import { parseResponse } from "../utils/parseResponse";
 
 const Contact = () => {
   const [errors, setErrors] = useState<{ email?: string; phone?: string; general?: string }>({});
@@ -35,7 +36,7 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await parseResponse(response);
         setFormData((prev) => ({
           ...prev,
           firstName: data.firstName,
@@ -102,14 +103,14 @@ const Contact = () => {
         }),
       });
 
-      const result = await response.json();
+      const result = await parseResponse(response);
 
       if (response.ok) {
         setPopupMessage("Wiadomość została wysłana!");
         setFormData((prev) => ({ ...prev, message: "" })); // Clear only message
         setTimeout(() => setPopupMessage(""), 3000);
       } else {
-        setPopupMessage(result.error || "Wystąpił błąd podczas wysyłania formularza. Spróbuj ponownie.");
+        setPopupMessage(result.error || result.message || "Wystąpił błąd podczas wysyłania formularza. Spróbuj ponownie.");
         setTimeout(() => setPopupMessage(""), 3000);
       }
     } catch (error) {
