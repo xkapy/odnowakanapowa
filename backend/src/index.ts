@@ -197,13 +197,15 @@ app.get("/api/user/profile", authMiddleware, async (c: any) => {
     }
 
     return c.json({
-      id: user.id,
-      email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      phone: user.phone,
-      isAdmin: user.is_admin,
-      role: user.is_admin ? "admin" : "user",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        phone: user.phone,
+        isAdmin: user.is_admin,
+        role: user.is_admin ? "admin" : "user",
+      }
     });
   } catch (error) {
     console.error("Profile error:", error);
