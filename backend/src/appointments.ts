@@ -4,8 +4,8 @@ import { getAppointmentServices } from "./services";
 export default function registerAppointmentsRoutes(app: Hono<any>, authMiddleware: any) {
   app.get("/api/appointments/services", async (c) => {
     try {
-      const services = await c.env.DB.prepare("SELECT id, name, price, description FROM services ORDER BY id").all();
-      return c.json(services.results || []);
+      const services = await (c.env as any).DB.prepare("SELECT id, name, price, description FROM services ORDER BY id").all();
+      return c.json({ services: services.results || [] });
     } catch (error) {
       console.error("Get services error:", error);
       return c.json({ error: "Błąd serwera" }, 500);
