@@ -116,7 +116,8 @@ const Booking = () => {
   };
 
   // Services that must be limited to quantity 1
-  const restrictedServiceIds = [301, 302, 303];
+  const restrictedServiceIds = [16, 17, 18];
+  const restrictedServiceNames = ["Usuwanie plam", "Usuwanie nieprzyjemnych zapachów", "Osuszanie"];
 
   useEffect(() => {
     fetchOccupiedDates();
@@ -163,7 +164,8 @@ const Booking = () => {
 
     setSelectedServices((prev) => {
       const existing = prev.find((s) => s.id === serviceId);
-      const isRestricted = restrictedServiceIds.includes(serviceId);
+      // Determine restriction by id OR by service name (in case API ids differ)
+      const isRestricted = restrictedServiceIds.includes(serviceId) || (service && restrictedServiceNames.includes(service.name));
       if (existing) {
         // If restricted, don't allow incrementing past 1
         if (isRestricted) return prev;
@@ -373,7 +375,7 @@ const Booking = () => {
                                       type="button"
                                       onClick={() => handleServiceAdd(service.id)}
                                       className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
-                                      disabled={restrictedServiceIds.includes(service.id) && getServiceQuantity(service.id) >= 1}
+                                      disabled={(restrictedServiceIds.includes(service.id) || restrictedServiceNames.includes(service.name)) && getServiceQuantity(service.id) >= 1}
                                     >
                                       +
                                     </button>
@@ -411,6 +413,7 @@ const Booking = () => {
                                       type="button"
                                       onClick={() => handleServiceAdd(service.id)}
                                       className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                      disabled={(restrictedServiceIds.includes(service.id) || restrictedServiceNames.includes(service.name)) && getServiceQuantity(service.id) >= 1}
                                     >
                                       +
                                     </button>
@@ -448,6 +451,7 @@ const Booking = () => {
                                       type="button"
                                       onClick={() => handleServiceAdd(service.id)}
                                       className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                      disabled={(restrictedServiceIds.includes(service.id) || restrictedServiceNames.includes(service.name)) && getServiceQuantity(service.id) >= 1}
                                     >
                                       +
                                     </button>
