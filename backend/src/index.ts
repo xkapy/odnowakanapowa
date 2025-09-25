@@ -629,7 +629,7 @@ app.get("/api/test/appointment/:id/services", async (c) => {
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
   try {
     console.log("🚀 PUT request received for appointment ID:", c.req.param("id"));
-    
+
     const appointmentId = c.req.param("id");
     const requestBody = await c.req.json();
     const { date, time, description, status, services } = requestBody;
@@ -654,13 +654,13 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
     const updateResult = await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(date, time, description || "", status || "pending", appointmentId)
       .run();
-    
+
     console.log("✅ Basic update result:", updateResult);
 
     // Update appointment services if provided
     if (services && Array.isArray(services)) {
       console.log("🔄 About to update services for appointment:", appointmentId, services);
-      
+
       // Delete existing services
       console.log("🗑️ Deleting existing services...");
       const deleteResult = await c.env.DB.prepare("DELETE FROM appointment_services WHERE appointment_id = ?").bind(appointmentId).run();

@@ -195,14 +195,20 @@ export default function Admin() {
     console.log("Saving appointment with data:", editFormData);
     console.log("Original services:", originalServices);
     
+    // Transform services to only include id and quantity for backend
+    const transformedServices = editFormData.services.map(service => ({
+      id: service.id,
+      quantity: service.quantity
+    }));
+    
     // Debug: Show exact structure being sent
     const requestData = {
       date: editFormData.date,
       time: editFormData.time,
-      services: editFormData.services,
+      services: transformedServices,
     };
     console.log("🚀 Exact request data:", JSON.stringify(requestData, null, 2));
-    console.log("🔧 Services structure:", editFormData.services);
+    console.log("🔧 Transformed services structure:", transformedServices);
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -238,9 +244,7 @@ export default function Admin() {
       console.log("💥 Request failed:", err);
       setError("Błąd połączenia z serwerem");
     }
-  };
-
-  const showRestoreDialog = (appointmentId: number) => {
+  };  const showRestoreDialog = (appointmentId: number) => {
     setAppointmentToRestore(appointmentId);
     setShowRestoreConfirm(true);
   };
