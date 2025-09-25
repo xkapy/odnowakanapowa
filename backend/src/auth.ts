@@ -75,7 +75,20 @@ export default function registerAuthRoutes(app: Hono<any>) {
         if (!sentAdmin) console.warn("Nie udało się wysłać maila do admina");
       }
 
-      return c.json({ success: true, message: "Konto utworzone." });
+      // Create JWT token for the new user (same shape as login)
+      const token = jwt.sign({ userId: newUser.id, email: newUser.email, isAdmin: newUser.is_admin }, (c.env as any).JWT_SECRET, { expiresIn: "7d" });
+
+      const userResp = {
+        id: newUser.id,
+        email: newUser.email,
+        firstName: newUser.first_name,
+        lastName: newUser.last_name,
+        phone: newUser.phone,
+        isAdmin: newUser.is_admin,
+        role: newUser.is_admin ? "admin" : "user",
+      };
+
+      return c.json({ success: true, token, user: userResp });
     } catch (error) {
       console.error("Register error:", error);
       return c.json({ error: "Błąd serwera" }, 500);
