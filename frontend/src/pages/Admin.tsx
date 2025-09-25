@@ -194,13 +194,13 @@ export default function Admin() {
 
     console.log("Saving appointment with data:", editFormData);
     console.log("Original services:", originalServices);
-    
+
     // Transform services to only include id and quantity for backend
-    const transformedServices = editFormData.services.map(service => ({
+    const transformedServices = editFormData.services.map((service) => ({
       id: service.id,
-      quantity: service.quantity
+      quantity: service.quantity,
     }));
-    
+
     // Debug: Show exact structure being sent
     const requestData = {
       date: editFormData.date,
@@ -227,7 +227,7 @@ export default function Admin() {
       });
 
       console.log("📡 Response status:", response.status);
-      
+
       if (response.ok) {
         const result = await response.json();
         console.log("✅ Success result:", result);
@@ -244,7 +244,8 @@ export default function Admin() {
       console.log("💥 Request failed:", err);
       setError("Błąd połączenia z serwerem");
     }
-  };  const showRestoreDialog = (appointmentId: number) => {
+  };
+  const showRestoreDialog = (appointmentId: number) => {
     setAppointmentToRestore(appointmentId);
     setShowRestoreConfirm(true);
   };

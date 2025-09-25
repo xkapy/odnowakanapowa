@@ -351,7 +351,6 @@ app.get("/api/admin/appointments", adminMiddleware, async (c) => {
       status: apt.status,
       description: apt.description,
       createdAt: apt.created_at,
-      updatedAt: apt.updated_at,
       user: apt.user_id
         ? {
             firstName: apt.first_name,
@@ -578,7 +577,7 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
       return c.json({ error: "Nieprawidłowy status" }, 400);
     }
 
-    await c.env.DB.prepare("UPDATE appointments SET status = ?, updated_at = datetime('now') WHERE id = ?").bind(status, appointmentId).run();
+    await c.env.DB.prepare("UPDATE appointments SET status = ? WHERE id = ?").bind(status, appointmentId).run();
 
     return c.json({
       success: true,
@@ -636,7 +635,7 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
 
     console.log("✅ Time slot is available, proceeding with update...");
     // Update appointment basic info
-    const updateResult = await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
+    const updateResult = await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ? WHERE id = ?")
       .bind(date, time, description || "", status || "pending", appointmentId)
       .run();
 
@@ -656,7 +655,7 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
       for (let i = 0; i < services.length; i++) {
         const service = services[i];
         console.log(`➕ Processing service ${i + 1}/${services.length}:`, JSON.stringify(service));
-        
+
         if (service.id && service.quantity && service.quantity > 0) {
           console.log(`➕ About to insert service: ${service.id}, quantity: ${service.quantity}`);
           const insertResult = await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
