@@ -1,11 +1,11 @@
-name = "odnowakanapowa-frontend"
+name = "ok-frontend"
 compatibility_date = "2024-10-25"
 
 # Pages configuration
 pages_build_output_dir = "dist"
 
 [env.production]
-name = "odnowakanapowa-frontend-git"
+name = "ok-frontend"
 
-[env.development]
-name = "odnowakanapowa-frontend-dev"
+[env.preview]
+name = "ok-frontend-preview"

@@ -73,4 +73,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: './frontend'
-          command: pages deploy dist --project-name odnowakanapowa-frontend-git
+          command: pages deploy dist --project-name ok-frontend

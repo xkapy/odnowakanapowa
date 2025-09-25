@@ -1,10 +1,17 @@
-name = "odnowa-kanapowa-backend"
+name = "ok-backend"
 main = "src/index.ts"
 compatibility_date = "2024-10-25"
 compatibility_flags = ["nodejs_compat"]
 
 # Production environment (default for auto-deployment)
 route = { pattern = "api.odnowakanapowa.pl/*", zone_name = "odnowakanapowa.pl" }
+
+# GitHub integration
+[triggers]
+crons = []
+
+[build]
+command = ""
 
 [vars]
 ENVIRONMENT = "production"
@@ -16,7 +23,7 @@ database_name = "odnowa-kanapowa-db"
 database_id = "224216c4-7a70-4ce7-999a-84e84b77b294"
 
 [env.development]
-name = "odnowa-kanapowa-backend-dev"
+name = "ok-backend-dev"
 
 [env.development.vars]
 ENVIRONMENT = "development"
