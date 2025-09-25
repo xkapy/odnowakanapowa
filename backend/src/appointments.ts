@@ -64,8 +64,10 @@ export default function registerAppointmentsRoutes(app: Hono<any>, authMiddlewar
       if (services && Array.isArray(services) && services.length > 0) {
         for (const service of services) {
           try {
+            // Cap quantity to 1 for restricted services (ids 301-303)
+            const qty = [301, 302, 303].includes(service.id) ? 1 : service.quantity || 1;
             await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
-              .bind(appointmentId, service.id, service.quantity || 1)
+              .bind(appointmentId, service.id, qty)
               .run();
           } catch (error) {
             console.log("Could not save appointment service:", error);

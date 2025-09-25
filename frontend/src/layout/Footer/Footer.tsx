@@ -23,11 +23,11 @@ const Footer = () => {
                     Usługi
                   </Link>
                 </li>
-                <li className="mb-3">
-                  <Link to="/store" className="hover:underline">
-                    Cennik
-                  </Link>
-                </li>
+                    <li className="mb-3">
+                      <Link to="/booking" className="hover:underline">
+                        Umów wizytę
+                      </Link>
+                    </li>
                 <li className="mb-3">
                   <Link to="/about" className="hover:underline">
                     O nas

@@ -30,7 +30,8 @@ export default function registerUserRoutes(app: Hono<any>, authMiddleware: any) 
         time: apt.time,
         status: apt.status,
         description: apt.description,
-        createdAt: apt.created_at,
+        // Convert D1/SQLite datetime to ISO string in UTC to avoid local offset issues on frontend
+        createdAt: new Date(apt.created_at + "Z").toISOString(),
         services: servicesByAppointment[apt.id] || [],
       }));
       return c.json({ appointments: formattedAppointments });

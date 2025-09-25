@@ -115,6 +115,9 @@ const Booking = () => {
     ),
   };
 
+  // Services that must be limited to quantity 1
+  const restrictedServiceIds = [301, 302, 303];
+
   useEffect(() => {
     fetchOccupiedDates();
   }, []);
@@ -160,7 +163,10 @@ const Booking = () => {
 
     setSelectedServices((prev) => {
       const existing = prev.find((s) => s.id === serviceId);
+      const isRestricted = restrictedServiceIds.includes(serviceId);
       if (existing) {
+        // If restricted, don't allow incrementing past 1
+        if (isRestricted) return prev;
         return prev.map((s) => (s.id === serviceId ? { ...s, quantity: s.quantity + 1 } : s));
       } else {
         return [
@@ -367,6 +373,7 @@ const Booking = () => {
                                       type="button"
                                       onClick={() => handleServiceAdd(service.id)}
                                       className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                      disabled={restrictedServiceIds.includes(service.id) && getServiceQuantity(service.id) >= 1}
                                     >
                                       +
                                     </button>
