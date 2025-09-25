@@ -16,7 +16,8 @@ export default function registerAppointmentsRoutes(app: Hono<any>, authMiddlewar
   app.get("/api/services", async (c) => {
     try {
       const services = await (c.env as any).DB.prepare("SELECT id, name, price, description FROM services ORDER BY id").all();
-      return c.json({ services: services.results || [] });
+      // Return raw array to match frontend expectations
+      return c.json(services.results || []);
     } catch (error) {
       console.error("Get services error:", error);
       return c.json({ error: "Błąd serwera" }, 500);
