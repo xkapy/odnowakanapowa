@@ -24,12 +24,13 @@ const app = new Hono<{ Bindings: Env }>();
 // Helper function to get services for appointments
 const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) => {
   if (appointmentIds.length === 0) return {};
-  
+
   try {
-    const placeholders = appointmentIds.map(() => '?').join(',');
+    const placeholders = appointmentIds.map(() => "?").join(",");
     const query = `
       SELECT 
         aps.appointment_id,
+        aps.quantity,
         s.id,
         s.name,
         s.price,
@@ -38,9 +39,12 @@ const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) 
       JOIN services s ON aps.service_id = s.id
       WHERE aps.appointment_id IN (${placeholders})
     `;
-    
-    const result = await db.prepare(query).bind(...appointmentIds).all();
-    
+
+    const result = await db
+      .prepare(query)
+      .bind(...appointmentIds)
+      .all();
+
     // Group services by appointment_id
     const servicesByAppointment: { [key: number]: any[] } = {};
     (result.results || []).forEach((row: any) => {
@@ -52,10 +56,10 @@ const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) 
         name: row.name,
         price: row.price,
         description: row.description,
-        quantity: 1 // Default quantity
+        quantity: row.quantity || 1,
       });
     });
-    
+
     return servicesByAppointment;
   } catch (error) {
     console.log("Could not load appointment services (table might not exist):", error);
@@ -395,7 +399,7 @@ app.get("/api/appointments/available-times/:date", async (c) => {
 app.post("/api/appointments", authMiddleware, async (c: any) => {
   try {
     const userPayload = c.get("user");
-    const { date, time, serviceIds, comment } = await c.req.json();
+    const { date, time, services, serviceIds, comment } = await c.req.json();
 
     if (!date || !time) {
       return c.json({ error: "Data i godzina są wymagane" }, 400);
@@ -415,15 +419,24 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
 
     const appointmentId = result.meta.last_row_id;
 
-    // Save services if provided
-    if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
-      for (const serviceId of serviceIds) {
+    // Save services if provided (new format with quantity)
+    if (services && Array.isArray(services) && services.length > 0) {
+      for (const service of services) {
         try {
-          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id) VALUES (?, ?)")
-            .bind(appointmentId, serviceId)
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+            .bind(appointmentId, service.id, service.quantity || 1)
             .run();
         } catch (error) {
-          // Table might not exist, continue without error
+          console.log("Could not save appointment service:", error);
+        }
+      }
+    }
+    // Backward compatibility with old serviceIds format
+    else if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
+      for (const serviceId of serviceIds) {
+        try {
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)").bind(appointmentId, serviceId, 1).run();
+        } catch (error) {
           console.log("Could not save appointment service:", error);
         }
       }
@@ -443,7 +456,7 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
 // Create guest appointment
 app.post("/api/appointments/guest", async (c) => {
   try {
-    const { date, time, serviceIds, comment, guestName, guestEmail, guestPhone } = await c.req.json();
+    const { date, time, services, serviceIds, comment, guestName, guestEmail, guestPhone } = await c.req.json();
 
     if (!date || !time || !guestName || !guestEmail || !guestPhone) {
       return c.json({ error: "Wszystkie pola są wymagane" }, 400);
@@ -465,15 +478,24 @@ app.post("/api/appointments/guest", async (c) => {
 
     const appointmentId = result.meta.last_row_id;
 
-    // Save services if provided
-    if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
-      for (const serviceId of serviceIds) {
+    // Save services if provided (new format with quantity)
+    if (services && Array.isArray(services) && services.length > 0) {
+      for (const service of services) {
         try {
-          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id) VALUES (?, ?)")
-            .bind(appointmentId, serviceId)
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+            .bind(appointmentId, service.id, service.quantity || 1)
             .run();
         } catch (error) {
-          // Table might not exist, continue without error
+          console.log("Could not save appointment service:", error);
+        }
+      }
+    }
+    // Backward compatibility with old serviceIds format
+    else if (serviceIds && Array.isArray(serviceIds) && serviceIds.length > 0) {
+      for (const serviceId of serviceIds) {
+        try {
+          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)").bind(appointmentId, serviceId, 1).run();
+        } catch (error) {
           console.log("Could not save appointment service:", error);
         }
       }
@@ -544,7 +566,6 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
     return c.json({ error: "Błąd serwera" }, 500);
   }
 });
-
 
 // Admin - Update appointment details
 app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
