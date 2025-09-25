@@ -85,44 +85,33 @@ const Booking = () => {
 
   // Categorize services from API based on service names
   const categorizeServices = (services: any[]) => {
-    const furniture = services.filter(service => 
-      ['Kanapa', 'Narożnik mały szezlong', 'Narożnik duży L', 'Narożnik duży U', 
-       'Fotel mały', 'Fotel duży', 'Krzesło tapicerowane', 'Puf podnóżek', 'Poduszka tapicerowana'].includes(service.name)
+    const furniture = services.filter((service) =>
+      ["Kanapa", "Narożnik mały szezlong", "Narożnik duży L", "Narożnik duży U", "Fotel mały", "Fotel duży", "Krzesło tapicerowane", "Puf podnóżek", "Poduszka tapicerowana"].includes(service.name)
     );
-    
-    const mattress = services.filter(service => 
-      ['Materac pojedynczy', 'Materac podwójny'].includes(service.name)
-    );
-    
-    const vehicle = services.filter(service => 
-      ['Fotele samochodowe', 'Dywanik tekstylny', 'Podłoga samochodu', 'Bonetowanie podsufitki'].includes(service.name)
-    );
-    
-    const other = services.filter(service => 
-      ['Usuwanie plam', 'Usuwanie nieprzyjemnych zapachów', 'Osuszanie'].includes(service.name)
-    );
-    
+
+    const mattress = services.filter((service) => ["Materac pojedynczy", "Materac podwójny"].includes(service.name));
+
+    const vehicle = services.filter((service) => ["Fotele samochodowe", "Dywanik tekstylny", "Podłoga samochodu", "Bonetowanie podsufitki"].includes(service.name));
+
+    const other = services.filter((service) => ["Usuwanie plam", "Usuwanie nieprzyjemnych zapachów", "Osuszanie"].includes(service.name));
+
     return { furniture, mattress, vehicle, other };
   };
 
   // Filter services based on search term
   const categorizedServices = categorizeServices(allServices);
   const filteredServices = {
-    furniture: categorizedServices.furniture.filter((service) => 
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    furniture: categorizedServices.furniture.filter(
+      (service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
-    mattress: categorizedServices.mattress.filter((service) => 
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    mattress: categorizedServices.mattress.filter(
+      (service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
-    vehicle: categorizedServices.vehicle.filter((service) => 
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    vehicle: categorizedServices.vehicle.filter(
+      (service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
-    other: categorizedServices.other.filter((service) => 
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    other: categorizedServices.other.filter(
+      (service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
     ),
   };
 
@@ -359,32 +348,28 @@ const Booking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredServices.furniture.map((service) => (
                               <div key={`furniture-${service.id}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                                <div className="p-4">
-                                  <h4 className="font-medium text-gray-900 mb-2">{service.name}</h4>
-                                  <p className="text-sm text-gray-600 mb-2 line-clamp-3">{service.desc}</p>
-                                  <div className="flex justify-between items-center mb-3">
-                                    <span className="text-sm text-gray-500">{service.durationDesc}</span>
-                                    <span className="font-medium text-gray-900">{service.price}</span>
+                                <div className="p-4 flex flex-col items-center text-center h-full justify-between">
+                                  <div className="flex-grow flex flex-col justify-center">
+                                    <h4 className="font-medium text-gray-900 mb-3">{service.name}</h4>
+                                    <span className="font-medium text-[var(--color-blue-dark)] mb-4">{service.price}</span>
                                   </div>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceRemove(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                                        disabled={getServiceQuantity(service.id) === 0}
-                                      >
-                                        -
-                                      </button>
-                                      <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceAdd(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
+                                  <div className="flex items-center space-x-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceRemove(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                      disabled={getServiceQuantity(service.id) === 0}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceAdd(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                    >
+                                      +
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -400,32 +385,28 @@ const Booking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredServices.mattress.map((service) => (
                               <div key={`mattress-${service.id}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                                <div className="p-4">
-                                  <h4 className="font-medium text-gray-900 mb-2">{service.name}</h4>
-                                  <p className="text-sm text-gray-600 mb-2 line-clamp-3">{service.desc}</p>
-                                  <div className="flex justify-between items-center mb-3">
-                                    <span className="text-sm text-gray-500">{service.durationDesc}</span>
-                                    <span className="font-medium text-gray-900">{service.price}</span>
+                                <div className="p-4 flex flex-col items-center text-center h-full justify-between">
+                                  <div className="flex-grow flex flex-col justify-center">
+                                    <h4 className="font-medium text-gray-900 mb-3">{service.name}</h4>
+                                    <span className="font-medium text-[var(--color-blue-dark)] mb-4">{service.price}</span>
                                   </div>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceRemove(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                                        disabled={getServiceQuantity(service.id) === 0}
-                                      >
-                                        -
-                                      </button>
-                                      <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceAdd(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
+                                  <div className="flex items-center space-x-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceRemove(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                      disabled={getServiceQuantity(service.id) === 0}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceAdd(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                    >
+                                      +
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -441,32 +422,28 @@ const Booking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredServices.vehicle.map((service) => (
                               <div key={`vehicle-${service.id}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                                <div className="p-4">
-                                  <h4 className="font-medium text-gray-900 mb-2">{service.name}</h4>
-                                  <p className="text-sm text-gray-600 mb-2 line-clamp-3">{service.desc}</p>
-                                  <div className="flex justify-between items-center mb-3">
-                                    <span className="text-sm text-gray-500">{service.durationDesc}</span>
-                                    <span className="font-medium text-gray-900">{service.price}</span>
+                                <div className="p-4 flex flex-col items-center text-center h-full justify-between">
+                                  <div className="flex-grow flex flex-col justify-center">
+                                    <h4 className="font-medium text-gray-900 mb-3">{service.name}</h4>
+                                    <span className="font-medium text-[var(--color-blue-dark)] mb-4">{service.price}</span>
                                   </div>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceRemove(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                                        disabled={getServiceQuantity(service.id) === 0}
-                                      >
-                                        -
-                                      </button>
-                                      <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceAdd(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
+                                  <div className="flex items-center space-x-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceRemove(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                      disabled={getServiceQuantity(service.id) === 0}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceAdd(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                    >
+                                      +
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -482,32 +459,28 @@ const Booking = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredServices.other.map((service) => (
                               <div key={`other-${service.id}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                                <div className="p-4">
-                                  <h4 className="font-medium text-gray-900 mb-2">{service.name}</h4>
-                                  <p className="text-sm text-gray-600 mb-2 line-clamp-3">{service.desc}</p>
-                                  <div className="flex justify-between items-center mb-3">
-                                    <span className="text-sm text-gray-500">{service.durationDesc}</span>
-                                    <span className="font-medium text-gray-900">{service.price}</span>
+                                <div className="p-4 flex flex-col items-center text-center h-full justify-between">
+                                  <div className="flex-grow flex flex-col justify-center">
+                                    <h4 className="font-medium text-gray-900 mb-3">{service.name}</h4>
+                                    <span className="font-medium text-[var(--color-blue-dark)] mb-4">{service.price}</span>
                                   </div>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceRemove(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                                        disabled={getServiceQuantity(service.id) === 0}
-                                      >
-                                        -
-                                      </button>
-                                      <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleServiceAdd(service.id)}
-                                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
+                                  <div className="flex items-center space-x-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceRemove(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                      disabled={getServiceQuantity(service.id) === 0}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="w-8 text-center font-medium">{getServiceQuantity(service.id)}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleServiceAdd(service.id)}
+                                      className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600"
+                                    >
+                                      +
+                                    </button>
                                   </div>
                                 </div>
                               </div>
