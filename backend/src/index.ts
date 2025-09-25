@@ -34,14 +34,58 @@ const createEmailTransporter = (adminEmail: string, appPassword: string) => {
 };
 
 // Email templates
-const getAppointmentConfirmationEmail = (firstName: string, date: string, time: string, services: string[]) => {
+// Email for user - appointment pending approval
+const getAppointmentPendingEmail = (firstName: string, date: string, time: string, services: string[]) => {
   return {
-    subject: 'Potwierdzenie wizyty - Odnowa Kanapowa',
+    subject: 'Rezerwacja złożona - oczekuje na potwierdzenie - Odnowa Kanapowa',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2D5A27;">Potwierdzenie wizyty - Odnowa Kanapowa</h2>
+        <h2 style="color: #2D5A27;">Rezerwacja złożona - Odnowa Kanapowa</h2>
         <p>Dzień dobry ${firstName},</p>
-        <p>Dziękujemy za dokonanie rezerwacji. Oto szczegóły Twojej wizyty:</p>
+        <p>Dziękujemy za złożenie rezerwacji. Twoja wizyta została zarejestrowana i <strong>oczekuje na potwierdzenie</strong> przez nasz zespół.</p>
+        
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #856404; margin-top: 0;">⏳ Status: Oczekuje na potwierdzenie</h3>
+          <p style="color: #856404;">Skontaktujemy się z Tobą wkrótce w celu potwierdzenia terminu.</p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #2D5A27; margin-top: 0;">Szczegóły rezerwacji:</h3>
+          <p><strong>Data:</strong> ${date}</p>
+          <p><strong>Godzina:</strong> ${time}</p>
+          <p><strong>Usługi:</strong></p>
+          <ul>
+            ${services.map(service => `<li>${service}</li>`).join('')}
+          </ul>
+        </div>
+        
+        <p>W razie pytań prosimy o kontakt:</p>
+        <p>📞 <strong>Telefon:</strong> +48 123 456 789</p>
+        <p>📧 <strong>Email:</strong> kontakt@odnowakanapowa.pl</p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+        <p style="color: #6c757d; font-size: 14px;">
+          Wiadomość została wysłana automatycznie. Prosimy nie odpowiadać na ten email.
+        </p>
+      </div>
+    `
+  };
+};
+
+// Email for user - appointment confirmed
+const getAppointmentConfirmationEmail = (firstName: string, date: string, time: string, services: string[]) => {
+  return {
+    subject: 'Wizyta potwierdzona! - Odnowa Kanapowa',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2D5A27;">✅ Wizyta potwierdzona! - Odnowa Kanapowa</h2>
+        <p>Dzień dobry ${firstName},</p>
+        <p><strong>Świetne wieści!</strong> Twoja wizyta została oficjalnie potwierdzona.</p>
+        
+        <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #155724; margin-top: 0;">✅ Status: Potwierdzona</h3>
+          <p style="color: #155724;">Twoja wizyta została zatwierdzona. Czekamy na Ciebie!</p>
+        </div>
         
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="color: #2D5A27; margin-top: 0;">Szczegóły wizyty:</h3>
@@ -60,6 +104,52 @@ const getAppointmentConfirmationEmail = (firstName: string, date: string, time: 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
         <p style="color: #6c757d; font-size: 14px;">
           Wiadomość została wysłana automatycznie. Prosimy nie odpowiadać na ten email.
+        </p>
+      </div>
+    `
+  };
+};
+
+// Email for admin - new appointment notification
+const getNewAppointmentNotificationEmail = (customerName: string, customerEmail: string, customerPhone: string | null, date: string, time: string, services: string[], isGuest: boolean = false) => {
+  return {
+    subject: `Nowa rezerwacja wizyty od ${customerName} - ${date} ${time}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2D5A27;">🔔 Nowa rezerwacja wizyty</h2>
+        <p>Otrzymano nową rezerwację wizyty, która oczekuje na potwierdzenie w panelu administratora.</p>
+        
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #856404; margin-top: 0;">⚠️ Wymagana akcja</h3>
+          <p style="color: #856404;">Zaloguj się do panelu administratora, aby potwierdzić lub odrzucić rezerwację.</p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #2D5A27; margin-top: 0;">Dane klienta:</h3>
+          <p><strong>Imię:</strong> ${customerName}</p>
+          <p><strong>Email:</strong> ${customerEmail}</p>
+          ${customerPhone ? `<p><strong>Telefon:</strong> ${customerPhone}</p>` : ''}
+          <p><strong>Typ konta:</strong> ${isGuest ? 'Gość (bez konta)' : 'Zarejestrowany użytkownik'}</p>
+        </div>
+        
+        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #1565c0; margin-top: 0;">Szczegóły wizyty:</h3>
+          <p><strong>Data:</strong> ${date}</p>
+          <p><strong>Godzina:</strong> ${time}</p>
+          <p><strong>Usługi:</strong></p>
+          <ul>
+            ${services.map(service => `<li>${service}</li>`).join('')}
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="https://odnowakanapowa.pl/admin" style="background-color: #2D5A27; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+            Przejdź do panelu administratora
+          </a>
+        </div>
+        
+        <p style="color: #6c757d; font-size: 14px;">
+          Powiadomienie zostało wysłane automatycznie z systemu rezerwacji Odnowa Kanapowa.
         </p>
       </div>
     `
@@ -650,10 +740,10 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
       console.log(`[USER] No services provided for appointment ${appointmentId}`);
     }
 
-    // Send appointment confirmation email
+    // Send appointment notification emails
     try {
       // Get user details
-      const user = await c.env.DB.prepare("SELECT first_name, email FROM users WHERE id = ?").bind(userPayload.userId).first();
+      const user = await c.env.DB.prepare("SELECT first_name, email, phone FROM users WHERE id = ?").bind(userPayload.userId).first();
       
       if (user) {
         // Get service names for email
@@ -676,19 +766,37 @@ app.post("/api/appointments", authMiddleware, async (c: any) => {
         }
         
         const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
-        const emailTemplate = getAppointmentConfirmationEmail(user.first_name, date, time, serviceNames);
         
+        // Send pending email to user
+        const userEmailTemplate = getAppointmentPendingEmail(user.first_name, date, time, serviceNames);
         await transporter.sendMail({
           from: c.env.ADMIN_EMAIL,
           to: user.email,
-          subject: emailTemplate.subject,
-          html: emailTemplate.html,
+          subject: userEmailTemplate.subject,
+          html: userEmailTemplate.html,
         });
         
-        console.log(`Appointment confirmation email sent to ${user.email}`);
+        // Send notification to admin
+        const adminEmailTemplate = getNewAppointmentNotificationEmail(
+          user.first_name, 
+          user.email, 
+          user.phone || null, 
+          date, 
+          time, 
+          serviceNames, 
+          false // not a guest
+        );
+        await transporter.sendMail({
+          from: c.env.ADMIN_EMAIL,
+          to: c.env.ADMIN_EMAIL,
+          subject: adminEmailTemplate.subject,
+          html: adminEmailTemplate.html,
+        });
+        
+        console.log(`Appointment pending email sent to ${user.email} and notification sent to admin`);
       }
     } catch (emailError) {
-      console.error('Error sending appointment confirmation email:', emailError);
+      console.error('Error sending appointment notification emails:', emailError);
       // Don't fail the appointment creation if email fails
     }
 
@@ -754,7 +862,7 @@ app.post("/api/appointments/guest", async (c) => {
       }
     }
 
-    // Send appointment confirmation email to guest
+    // Send appointment notification emails to guest and admin
     try {
       // Get service names for email
       const serviceNames: string[] = [];
@@ -776,18 +884,36 @@ app.post("/api/appointments/guest", async (c) => {
       }
       
       const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
-      const emailTemplate = getAppointmentConfirmationEmail(guestName.split(' ')[0], date, time, serviceNames);
       
+      // Send pending email to guest
+      const guestEmailTemplate = getAppointmentPendingEmail(guestName.split(' ')[0], date, time, serviceNames);
       await transporter.sendMail({
         from: c.env.ADMIN_EMAIL,
         to: guestEmail,
-        subject: emailTemplate.subject,
-        html: emailTemplate.html,
+        subject: guestEmailTemplate.subject,
+        html: guestEmailTemplate.html,
       });
       
-      console.log(`Guest appointment confirmation email sent to ${guestEmail}`);
+      // Send notification to admin
+      const adminEmailTemplate = getNewAppointmentNotificationEmail(
+        guestName, 
+        guestEmail, 
+        guestPhone, 
+        date, 
+        time, 
+        serviceNames, 
+        true // is a guest
+      );
+      await transporter.sendMail({
+        from: c.env.ADMIN_EMAIL,
+        to: c.env.ADMIN_EMAIL,
+        subject: adminEmailTemplate.subject,
+        html: adminEmailTemplate.html,
+      });
+      
+      console.log(`Guest appointment pending email sent to ${guestEmail} and notification sent to admin`);
     } catch (emailError) {
-      console.error('Error sending guest appointment confirmation email:', emailError);
+      console.error('Error sending guest appointment notification emails:', emailError);
       // Don't fail the appointment creation if email fails
     }
 
@@ -845,7 +971,65 @@ app.put("/api/admin/appointments/:id/status", adminMiddleware, async (c) => {
       return c.json({ error: "Nieprawidłowy status" }, 400);
     }
 
+    // Get appointment details before updating
+    const appointment = await c.env.DB.prepare(
+      `SELECT 
+        a.*, 
+        u.first_name, 
+        u.email as user_email
+      FROM appointments a
+      LEFT JOIN users u ON a.user_id = u.id
+      WHERE a.id = ?`
+    ).bind(appointmentId).first();
+
+    if (!appointment) {
+      return c.json({ error: "Nie znaleziono wizyty" }, 404);
+    }
+
+    // Update status
     await c.env.DB.prepare("UPDATE appointments SET status = ? WHERE id = ?").bind(status, appointmentId).run();
+
+    // Send confirmation email if status changed to "confirmed"
+    if (status === "confirmed") {
+      try {
+        // Get service names for email
+        const appointmentIdNum = parseInt(appointmentId);
+        const servicesData = await getAppointmentServices(c.env.DB, [appointmentIdNum]);
+        const appointmentServices = servicesData[appointmentIdNum] || [];
+        const serviceNames = appointmentServices.map(service => 
+          `${service.name} (${service.quantity}x)`
+        );
+
+        const transporter = createEmailTransporter(c.env.ADMIN_EMAIL, c.env.ADMIN_EMAIL_APP_PASSWORD);
+        
+        // Determine recipient email and name
+        const recipientEmail = (appointment.user_email || appointment.guest_email) as string;
+        const guestName = appointment.guest_name as string;
+        const firstName = appointment.first_name as string;
+        const recipientName = firstName || (guestName ? guestName.split(' ')[0] : 'Klient');
+        
+        if (recipientEmail) {
+          const emailTemplate = getAppointmentConfirmationEmail(
+            recipientName, 
+            appointment.date as string, 
+            appointment.time as string, 
+            serviceNames
+          );
+          
+          await transporter.sendMail({
+            from: c.env.ADMIN_EMAIL,
+            to: recipientEmail,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html,
+          });
+          
+          console.log(`Appointment confirmation email sent to ${recipientEmail} after admin approval`);
+        }
+      } catch (emailError) {
+        console.error('Error sending appointment confirmation email:', emailError);
+        // Don't fail the status update if email fails
+      }
+    }
 
     return c.json({
       success: true,
