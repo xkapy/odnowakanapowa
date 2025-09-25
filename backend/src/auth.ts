@@ -65,7 +65,7 @@ export default function registerAuthRoutes(app: Hono<any>) {
       const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
       if (sendgridKey) {
         try {
-          await fetch("https://api.sendgrid.com/v3/mail/send", {
+          const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${sendgridKey}`,
@@ -77,6 +77,13 @@ export default function registerAuthRoutes(app: Hono<any>) {
               content: [{ type: "text/plain", value: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}` }],
             }),
           });
+
+          if (!sgRes.ok) {
+            const text = await sgRes.text().catch(() => "");
+            console.warn("SendGrid returned non-OK status:", sgRes.status, text);
+            // Also log confirm url so you can still confirm manually
+            console.log("Confirmation URL:", confirmUrl);
+          }
         } catch (e) {
           console.warn("SendGrid send error:", e);
           console.log("Confirmation URL:", confirmUrl);
@@ -149,6 +156,61 @@ export default function registerAuthRoutes(app: Hono<any>) {
       });
     } catch (error) {
       console.error("Login error:", error);
+      return c.json({ error: "Błąd serwera" }, 500);
+    }
+  });
+
+  // Resend confirmation token (for testing / manual resend). Accepts { email }
+  app.post("/api/auth/resend", async (c) => {
+    try {
+      const { email } = await c.req.json();
+      if (!email) return c.json({ error: "Email jest wymagany" }, 400);
+
+      const user = await (c.env as any).DB.prepare("SELECT * FROM users WHERE email = ?").bind(email).first();
+      if (!user) return c.json({ error: "Nie znaleziono użytkownika" }, 404);
+
+      // Generate confirmation token (JWT) valid for 24h
+      const confirmationToken = jwt.sign({ userId: user.id, email: user.email, type: "email_confirm" }, (c.env as any).JWT_SECRET, { expiresIn: "1d" });
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+      // Store token
+      await (c.env as any).DB.prepare(`INSERT INTO email_confirmations (user_id, token, expires_at, confirmed) VALUES (?, ?, ?, 0)`).bind(user.id, confirmationToken, expiresAt).run();
+
+      const apiBase = (c.env as any).API_BASE_URL || process.env.API_BASE_URL || "";
+      const confirmUrl = apiBase ? `${apiBase.replace(/\/$/, "")}/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}` : `/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}`;
+
+      const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+      if (sendgridKey) {
+        try {
+          const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${sendgridKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              personalizations: [{ to: [{ email }], subject: "Potwierdź swój adres e-mail" }],
+              from: { email: "no-reply@odnowakanapowa.pl", name: "Odnowa Kanapowa" },
+              content: [{ type: "text/plain", value: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}` }],
+            }),
+          });
+
+          if (!sgRes.ok) {
+            const text = await sgRes.text().catch(() => "");
+            console.warn("SendGrid resend returned non-OK status:", sgRes.status, text);
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        } catch (e) {
+          console.warn("SendGrid resend error:", e);
+          console.log("Confirmation URL:", confirmUrl);
+        }
+      } else {
+        console.log("Confirmation URL:", confirmUrl);
+      }
+
+      return c.json({ success: true, message: "Token potwierdzający wysłany (jeśli SendGrid jest skonfigurowany)." });
+    } catch (e) {
+      console.error("Resend error:", e);
       return c.json({ error: "Błąd serwera" }, 500);
     }
   });
