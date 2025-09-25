@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Calendar from "../components/Calendar";
 import { API_BASE_URL } from "../config/api";
-import { furniture, mattress, vehicle, other } from "../data/data";
+// Removed local data imports - now using API data with categorization
 
 interface SelectedService {
   id: number;
@@ -53,11 +53,12 @@ const Booking = () => {
       const response = await fetch(`${API_BASE_URL}/api/services`);
       if (response.ok) {
         const services = await response.json();
-        console.log("Loaded services from API:", services);
+        console.log("✅ Loaded services from API:", services.length, "services");
+        console.log("API Services IDs:", services.map((s: any) => `${s.id}: ${s.name}`).join(", "));
         setApiServices(services);
         setServicesLoaded(true);
       } else {
-        console.error("Failed to fetch services from API");
+        console.error("❌ Failed to fetch services from API, status:", response.status);
         setServicesLoaded(true); // Still set to true to use fallback
       }
     } catch (error) {
@@ -67,26 +68,62 @@ const Booking = () => {
   };
 
   // Use API services if loaded, otherwise fallback to local data
-  const allServices = servicesLoaded && apiServices.length > 0 
-    ? apiServices.map(service => ({
-        id: service.id,
-        name: service.name,
-        price: service.price,
-        description: service.description,
-        quantity: 0 // Will be managed by selectedServices state
-      }))
-    : [...furniture, ...mattress, ...vehicle, ...other];
+  const allServices =
+    servicesLoaded && apiServices.length > 0
+      ? apiServices.map((service) => ({
+          id: service.id,
+          name: service.name,
+          price: service.price,
+          description: service.description,
+          quantity: 0, // Will be managed by selectedServices state
+        }))
+      : []; // Force empty array until API loads to prevent using wrong IDs
 
   useEffect(() => {
     fetchServicesFromAPI();
   }, []);
 
+  // Categorize services from API based on service names
+  const categorizeServices = (services: any[]) => {
+    const furniture = services.filter(service => 
+      ['Kanapa', 'Narożnik mały szezlong', 'Narożnik duży L', 'Narożnik duży U', 
+       'Fotel mały', 'Fotel duży', 'Krzesło tapicerowane', 'Puf podnóżek', 'Poduszka tapicerowana'].includes(service.name)
+    );
+    
+    const mattress = services.filter(service => 
+      ['Materac pojedynczy', 'Materac podwójny'].includes(service.name)
+    );
+    
+    const vehicle = services.filter(service => 
+      ['Fotele samochodowe', 'Dywanik tekstylny', 'Podłoga samochodu', 'Bonetowanie podsufitki'].includes(service.name)
+    );
+    
+    const other = services.filter(service => 
+      ['Usuwanie plam', 'Usuwanie nieprzyjemnych zapachów', 'Osuszanie'].includes(service.name)
+    );
+    
+    return { furniture, mattress, vehicle, other };
+  };
+
   // Filter services based on search term
+  const categorizedServices = categorizeServices(allServices);
   const filteredServices = {
-    furniture: furniture.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || service.desc.toLowerCase().includes(searchTerm.toLowerCase())),
-    mattress: mattress.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || service.desc.toLowerCase().includes(searchTerm.toLowerCase())),
-    vehicle: vehicle.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || service.desc.toLowerCase().includes(searchTerm.toLowerCase())),
-    other: other.filter((service) => service.name.toLowerCase().includes(searchTerm.toLowerCase()) || service.desc.toLowerCase().includes(searchTerm.toLowerCase())),
+    furniture: categorizedServices.furniture.filter((service) => 
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    ),
+    mattress: categorizedServices.mattress.filter((service) => 
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    ),
+    vehicle: categorizedServices.vehicle.filter((service) => 
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    ),
+    other: categorizedServices.other.filter((service) => 
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    ),
   };
 
   useEffect(() => {
