@@ -71,7 +71,13 @@ const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) 
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:5173", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl", "https://odnowakanapowa-frontend-git.pages.dev", "https://*.odnowakanapowa-frontend-git.pages.dev"],
+    origin: [
+      "http://localhost:5173", 
+      "https://odnowakanapowa.pl", 
+      "https://www.odnowakanapowa.pl", 
+      "https://ok-frontend.pages.dev", 
+      "https://*.ok-frontend.pages.dev"
+    ],
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
@@ -82,8 +88,8 @@ app.use(
 app.get("/", (c) => {
   return c.json({
     service: "Odnowa Kanapowa API",
-    version: "2.0.0",
-    timestamp: new Date().toISOString(),
+    version: "2.0.1", // Test auto-deploy
+    status: "OK",
   });
 });
 
