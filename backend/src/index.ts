@@ -67,16 +67,36 @@ const getAppointmentServices = async (db: D1Database, appointmentIds: number[]) 
   }
 };
 
-// CORS
-app.use(
-  "*",
-  cors({
-    origin: ["http://localhost:5173", "https://odnowakanapowa.pl", "https://www.odnowakanapowa.pl", "https://odnowakanapowa-frontend-git.pages.dev", "https://*.odnowakanapowa-frontend-git.pages.dev"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["POST", "GET", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
+// Dynamic CORS middleware: echoes allowed origin (needed to support credentialed requests from Pages)
+app.use("*", async (c, next) => {
+  const origin = c.req.header("Origin");
+
+  // Static allowlist
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "https://odnowakanapowa.pl",
+    "https://www.odnowakanapowa.pl",
+    "https://odnowakanapowa-frontend-git.pages.dev",
+    // add more explicit domains here if needed
+  ]);
+
+  // Allow any Cloudflare Pages origin (e.g. https://<project>.pages.dev)
+  const isPagesDev = typeof origin === "string" && origin.endsWith(".pages.dev");
+
+  if (origin && (allowedOrigins.has(origin) || isPagesDev)) {
+    c.header("Access-Control-Allow-Origin", origin);
+    c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    c.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    c.header("Access-Control-Allow-Credentials", "true");
+  }
+
+  // Preflight
+  if (c.req.method === "OPTIONS") {
+    return c.body(null, 204);
+  }
+
+  await next();
+});
 
 // Health check
 app.get("/", (c) => {
