@@ -194,6 +194,15 @@ export default function Admin() {
 
     console.log("Saving appointment with data:", editFormData);
     console.log("Original services:", originalServices);
+    
+    // Debug: Show exact structure being sent
+    const requestData = {
+      date: editFormData.date,
+      time: editFormData.time,
+      services: editFormData.services,
+    };
+    console.log("🚀 Exact request data:", JSON.stringify(requestData, null, 2));
+    console.log("🔧 Services structure:", editFormData.services);
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -208,22 +217,25 @@ export default function Admin() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          date: editFormData.date,
-          time: editFormData.time,
-          services: editFormData.services,
-        }),
+        body: JSON.stringify(requestData),
       });
 
+      console.log("📡 Response status:", response.status);
+      
       if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Success result:", result);
         setSuccess("Wizyta została zaktualizowana");
         fetchAppointments();
         cancelEditing();
         setTimeout(() => setSuccess(""), 3000);
       } else {
+        const errorResult = await response.text();
+        console.log("❌ Error result:", errorResult);
         setError("Nie udało się zaktualizować wizyty");
       }
     } catch (err) {
+      console.log("💥 Request failed:", err);
       setError("Błąd połączenia z serwerem");
     }
   };
