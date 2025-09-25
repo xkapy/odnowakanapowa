@@ -632,6 +632,7 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
     const { date, time, description, status, services } = await c.req.json();
 
     console.log("🔄 Updating appointment:", appointmentId, "with data:", { date, time, services });
+    console.log("🔄 Services array length:", services?.length || 0);
 
     if (!date || !time) {
       return c.json({ error: "Data i godzina są wymagane" }, 400);
@@ -644,36 +645,46 @@ app.put("/api/admin/appointments/:id", adminMiddleware, async (c) => {
       return c.json({ error: "Ten termin jest już zajęty" }, 400);
     }
 
+    console.log("🔄 About to update basic appointment info...");
     // Update appointment basic info
-    await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
+    const updateResult = await c.env.DB.prepare("UPDATE appointments SET date = ?, time = ?, description = ?, status = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(date, time, description || "", status || "pending", appointmentId)
       .run();
+    
+    console.log("✅ Basic update result:", updateResult);
 
     // Update appointment services if provided
     if (services && Array.isArray(services)) {
-      console.log("🔄 Updating services for appointment:", appointmentId, services);
+      console.log("🔄 About to update services for appointment:", appointmentId, services);
       
       // Delete existing services
-      await c.env.DB.prepare("DELETE FROM appointment_services WHERE appointment_id = ?").bind(appointmentId).run();
+      console.log("🗑️ Deleting existing services...");
+      const deleteResult = await c.env.DB.prepare("DELETE FROM appointment_services WHERE appointment_id = ?").bind(appointmentId).run();
+      console.log("✅ Delete result:", deleteResult);
 
       // Insert new services
+      console.log("➕ Inserting new services...");
       for (const service of services) {
         if (service.id && service.quantity && service.quantity > 0) {
-          await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
+          console.log(`➕ About to insert service: ${service.id}, quantity: ${service.quantity}`);
+          const insertResult = await c.env.DB.prepare("INSERT INTO appointment_services (appointment_id, service_id, quantity) VALUES (?, ?, ?)")
             .bind(appointmentId, service.id, service.quantity)
             .run();
-          console.log("✅ Added service:", service.id, "quantity:", service.quantity);
+          console.log("✅ Insert result:", insertResult);
+        } else {
+          console.log("⏭️ Skipping service (invalid data):", service);
         }
       }
     }
 
+    console.log("🎉 Update completed successfully");
     return c.json({
       success: true,
       message: "Wizyta została zaktualizowana",
     });
   } catch (error) {
-    console.error("Update appointment error:", error);
-    return c.json({ error: "Błąd serwera" }, 500);
+    console.error("❌ Update appointment error:", error);
+    return c.json({ error: "Błąd serwera: " + (error instanceof Error ? error.message : String(error)) }, 500);
   }
 });
 
