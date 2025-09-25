@@ -21,9 +21,11 @@
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
     "@hono/zod-validator": "^0.7.3",
+    "@types/nodemailer": "^7.0.1",
     "bcryptjs": "^3.0.2",
     "hono": "^4.9.8",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.6",
     "zod": "^4.1.11"
   },
   "devDependencies": {
