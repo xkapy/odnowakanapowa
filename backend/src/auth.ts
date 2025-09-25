@@ -62,8 +62,15 @@ export default function registerAuthRoutes(app: Hono<any>) {
       const confirmUrl = apiBase ? `${apiBase.replace(/\/$/, "")}/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}` : `/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}`;
 
       // Send email via SendGrid if configured, otherwise log confirmation URL
-      const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
-      if (sendgridKey) {
+  const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+  const smtpHost = (c.env as any).SMTP_HOST || process.env.SMTP_HOST;
+  const smtpUser = (c.env as any).SMTP_USER || process.env.SMTP_USER;
+  const smtpPass = (c.env as any).SMTP_PASS || process.env.SMTP_PASS;
+  const smtpPort = (c.env as any).SMTP_PORT || process.env.SMTP_PORT || 587;
+
+  // Try SendGrid API first (works on Workers). If not configured and we're running in Node
+  // with SMTP creds, fall back to nodemailer (useful when running backend on Node).
+  if (sendgridKey) {
         try {
           const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
             method: "POST",
@@ -86,6 +93,50 @@ export default function registerAuthRoutes(app: Hono<any>) {
           }
         } catch (e) {
           console.warn("SendGrid send error:", e);
+          // attempt nodemailer fallback when possible
+          if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const nodemailer = require("nodemailer");
+              const transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: Number(smtpPort),
+                secure: Number(smtpPort) === 465, // true for 465, false for other ports
+                auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+              });
+              await transporter.sendMail({
+                from: `Odnowa Kanapowa <${smtpUser || "no-reply@odnowakanapowa.pl"}>`,
+                to: email,
+                subject: "Potwierdź swój adres e-mail",
+                text: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+              });
+            } catch (err) {
+              console.warn("Nodemailer fallback failed:", err);
+              console.log("Confirmation URL:", confirmUrl);
+            }
+          } else {
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        }
+      } else if (smtpHost && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+        // No SendGrid but SMTP configured and we are in Node: use nodemailer
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const nodemailer = require("nodemailer");
+          const transporter = nodemailer.createTransport({
+            host: smtpHost,
+            port: Number(smtpPort),
+            secure: Number(smtpPort) === 465,
+            auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+          });
+          await transporter.sendMail({
+            from: `Odnowa Kanapowa <${smtpUser || "no-reply@odnowakanapowa.pl"}>`,
+            to: email,
+            subject: "Potwierdź swój adres e-mail",
+            text: `Dziękujemy za rejestrację. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+          });
+        } catch (err) {
+          console.warn("Nodemailer send error:", err);
           console.log("Confirmation URL:", confirmUrl);
         }
       } else {
@@ -183,8 +234,13 @@ export default function registerAuthRoutes(app: Hono<any>) {
       const apiBase = (c.env as any).API_BASE_URL || process.env.API_BASE_URL || "";
       const confirmUrl = apiBase ? `${apiBase.replace(/\/$/, "")}/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}` : `/api/auth/confirm?token=${encodeURIComponent(confirmationToken)}`;
 
-      const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
-      if (sendgridKey) {
+  const sendgridKey = (c.env as any).SENDGRID_API_KEY || process.env.SENDGRID_API_KEY;
+  const smtpHost2 = (c.env as any).SMTP_HOST || process.env.SMTP_HOST;
+  const smtpUser2 = (c.env as any).SMTP_USER || process.env.SMTP_USER;
+  const smtpPass2 = (c.env as any).SMTP_PASS || process.env.SMTP_PASS;
+  const smtpPort2 = (c.env as any).SMTP_PORT || process.env.SMTP_PORT || 587;
+
+  if (sendgridKey) {
         try {
           const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
             method: "POST",
@@ -206,6 +262,48 @@ export default function registerAuthRoutes(app: Hono<any>) {
           }
         } catch (e) {
           console.warn("SendGrid resend error:", e);
+          if (smtpHost2 && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const nodemailer = require("nodemailer");
+              const transporter = nodemailer.createTransport({
+                host: smtpHost2,
+                port: Number(smtpPort2),
+                secure: Number(smtpPort2) === 465,
+                auth: smtpUser2 && smtpPass2 ? { user: smtpUser2, pass: smtpPass2 } : undefined,
+              });
+              await transporter.sendMail({
+                from: `Odnowa Kanapowa <${smtpUser2 || "no-reply@odnowakanapowa.pl"}>`,
+                to: email,
+                subject: "Potwierdź swój adres e-mail",
+                text: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+              });
+            } catch (err) {
+              console.warn("Nodemailer resend fallback failed:", err);
+              console.log("Confirmation URL:", confirmUrl);
+            }
+          } else {
+            console.log("Confirmation URL:", confirmUrl);
+          }
+        }
+      } else if (smtpHost2 && typeof process !== "undefined" && (process as any).versions && (process as any).versions.node) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const nodemailer = require("nodemailer");
+          const transporter = nodemailer.createTransport({
+            host: smtpHost2,
+            port: Number(smtpPort2),
+            secure: Number(smtpPort2) === 465,
+            auth: smtpUser2 && smtpPass2 ? { user: smtpUser2, pass: smtpPass2 } : undefined,
+          });
+          await transporter.sendMail({
+            from: `Odnowa Kanapowa <${smtpUser2 || "no-reply@odnowakanapowa.pl"}>`,
+            to: email,
+            subject: "Potwierdź swój adres e-mail",
+            text: `Dziękujemy. Potwierdź swój e-mail klikając: ${confirmUrl}`,
+          });
+        } catch (err) {
+          console.warn("Nodemailer resend send error:", err);
           console.log("Confirmation URL:", confirmUrl);
         }
       } else {
